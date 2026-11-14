@@ -62,7 +62,12 @@
   "size": { "w": 270, "h": 70 },
   "scale": "1",
   "frameTags": [
-   { "name": "brillo", "from": 0, "to": 5, "direction": "forward", "color": "#000000ff" }
+   { "name": "brillo", "from": 0, "to": 5, "direction": "forward", "color": "#000000ff" },
+   { "name": "caminar", "from": 6, "to": 13, "direction": "forward", "color": "#000000ff" },
+   { "name": "subir", "from": 14, "to": 15, "direction": "forward", "color": "#000000ff" },
+   { "name": "cima", "from": 16, "to": 16, "direction": "forward", "color": "#000000ff" },
+   { "name": "caer", "from": 17, "to": 17, "direction": "forward", "color": "#000000ff" },
+   { "name": "aterrizar", "from": 18, "to": 19, "direction": "forward", "color": "#000000ff" }
   ]
  }
 }

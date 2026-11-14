@@ -1,0 +1,91 @@
+{ "frames": [
+   {
+    "filename": "tridente #caminar 0.aseprite",
+    "frame": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "sourceSize": { "w": 45, "h": 70 },
+    "duration": 80
+   },
+   {
+    "filename": "tridente #caminar 1.aseprite",
+    "frame": { "x": 45, "y": 0, "w": 45, "h": 70 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "sourceSize": { "w": 45, "h": 70 },
+    "duration": 80
+   },
+   {
+    "filename": "tridente #caminar 2.aseprite",
+    "frame": { "x": 90, "y": 0, "w": 45, "h": 70 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "sourceSize": { "w": 45, "h": 70 },
+    "duration": 80
+   },
+   {
+    "filename": "tridente #caminar 3.aseprite",
+    "frame": { "x": 135, "y": 0, "w": 45, "h": 70 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "sourceSize": { "w": 45, "h": 70 },
+    "duration": 80
+   },
+   {
+    "filename": "tridente #caminar 4.aseprite",
+    "frame": { "x": 180, "y": 0, "w": 45, "h": 70 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "sourceSize": { "w": 45, "h": 70 },
+    "duration": 80
+   },
+   {
+    "filename": "tridente #caminar 5.aseprite",
+    "frame": { "x": 225, "y": 0, "w": 45, "h": 70 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "sourceSize": { "w": 45, "h": 70 },
+    "duration": 80
+   },
+   {
+    "filename": "tridente #caminar 6.aseprite",
+    "frame": { "x": 270, "y": 0, "w": 45, "h": 70 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "sourceSize": { "w": 45, "h": 70 },
+    "duration": 80
+   },
+   {
+    "filename": "tridente #caminar 7.aseprite",
+    "frame": { "x": 315, "y": 0, "w": 45, "h": 70 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 70 },
+    "sourceSize": { "w": 45, "h": 70 },
+    "duration": 80
+   }
+ ],
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.18.6-6-gb3e34acba-dev",
+  "image": "tridente_caminar.png",
+  "format": "RGBA8888",
+  "size": { "w": 360, "h": 70 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "brillo", "from": 0, "to": 5, "direction": "forward", "color": "#000000ff" },
+   { "name": "caminar", "from": 6, "to": 13, "direction": "forward", "color": "#000000ff" },
+   { "name": "subir", "from": 14, "to": 15, "direction": "forward", "color": "#000000ff" },
+   { "name": "cima", "from": 16, "to": 16, "direction": "forward", "color": "#000000ff" },
+   { "name": "caer", "from": 17, "to": 17, "direction": "forward", "color": "#000000ff" },
+   { "name": "aterrizar", "from": 18, "to": 19, "direction": "forward", "color": "#000000ff" }
+  ]
+ }
+}

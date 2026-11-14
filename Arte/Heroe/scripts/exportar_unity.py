@@ -16,10 +16,11 @@ ASEPRITE = os.environ.get("ASEPRITE", r"C:\Herramientas\Aseprite\aseprite.exe")
 SPRITES = os.path.join(PROYECTO, "Assets", "Sprites", "Heroe")
 
 # (archivo .aseprite, etiqueta, nombre de la hoja)
+MOVIMIENTO = ["caminar", "subir", "cima", "caer", "aterrizar"]
 ANIMACIONES = [
     ("heroe.aseprite", "reposo", "heroe_reposo"),
     (os.path.join("tridente", "tridente.aseprite"), "brillo", "tridente_brillo"),
-]
+] + [("heroe.aseprite", m, "heroe_" + m) for m in MOVIMIENTO]   + [(os.path.join("tridente", "tridente.aseprite"), m, "tridente_" + m) for m in MOVIMIENTO]
 
 
 def main():

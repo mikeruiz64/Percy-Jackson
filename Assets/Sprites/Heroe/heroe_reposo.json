@@ -44,7 +44,12 @@
   "size": { "w": 180, "h": 70 },
   "scale": "1",
   "frameTags": [
-   { "name": "reposo", "from": 0, "to": 3, "direction": "forward", "color": "#000000ff" }
+   { "name": "reposo", "from": 0, "to": 3, "direction": "forward", "color": "#000000ff" },
+   { "name": "caminar", "from": 4, "to": 11, "direction": "forward", "color": "#000000ff" },
+   { "name": "subir", "from": 12, "to": 13, "direction": "forward", "color": "#000000ff" },
+   { "name": "cima", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
+   { "name": "caer", "from": 15, "to": 15, "direction": "forward", "color": "#000000ff" },
+   { "name": "aterrizar", "from": 16, "to": 17, "direction": "forward", "color": "#000000ff" }
   ]
  }
 }

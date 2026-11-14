@@ -20,6 +20,10 @@ public static class ConstruirPercyJackson
     const string RutaEscena = "Assets/Escenas/Principal.unity";
     const int PixelesPorUnidad = 32;
 
+    // Animaciones de movimiento: (nombre, se repite en bucle)
+    static readonly (string, bool)[] Movimiento =
+        { ("caminar", true), ("subir", false), ("cima", true), ("caer", true), ("aterrizar", false) };
+
     static readonly Color ColorFondo = new Color(0.10f, 0.13f, 0.19f);
 
     // Formato JSON de Aseprite (json-array)
@@ -40,8 +44,17 @@ public static class ConstruirPercyJackson
 
         var reposo = CrearClip("heroe_reposo", "Assets/Animaciones/Heroe/reposo.anim");
         var brillo = CrearClip("tridente_brillo", "Assets/Animaciones/Tridente/brillo.anim");
-        var ctrlHeroe = CrearControlador("Assets/Animaciones/Heroe/Heroe.controller", reposo);
-        var ctrlTridente = CrearControlador("Assets/Animaciones/Tridente/Tridente.controller", brillo);
+        // Caminar y saltar (como Naia). El héroe y el tridente tienen estados con el mismo nombre,
+        // así Alexios.cs reproduce el mismo estado en los dos y el tridente sigue a la mano.
+        var estadosHeroe = new System.Collections.Generic.List<(string, AnimationClip)> { ("reposo", reposo) };
+        var estadosTridente = new System.Collections.Generic.List<(string, AnimationClip)> { ("reposo", brillo) };
+        foreach (var (nombre, bucle) in Movimiento)
+        {
+            estadosHeroe.Add((nombre, CrearClip("heroe_" + nombre, $"Assets/Animaciones/Heroe/{nombre}.anim", bucle)));
+            estadosTridente.Add((nombre, CrearClip("tridente_" + nombre, $"Assets/Animaciones/Tridente/{nombre}.anim", bucle)));
+        }
+        var ctrlHeroe = CrearControlador("Assets/Animaciones/Heroe/Heroe.controller", estadosHeroe);
+        var ctrlTridente = CrearControlador("Assets/Animaciones/Tridente/Tridente.controller", estadosTridente);
 
         var suelto = (TextureImporter)AssetImporter.GetAtPath(CarpetaSprites + "/tridente.png");
         ConfigurarImportador(suelto, SpriteImportMode.Single);
@@ -104,7 +117,7 @@ public static class ConstruirPercyJackson
         AssetDatabase.LoadAllAssetsAtPath(png).OfType<Sprite>().OrderBy(s => s.name).ToArray();
 
     // ---------- Animaciones ----------
-    static AnimationClip CrearClip(string hoja, string ruta)
+    static AnimationClip CrearClip(string hoja, string ruta, bool bucle = true)
     {
         string png = $"{CarpetaSprites}/{hoja}.png";
         var datos = JsonUtility.FromJson<Hoja>(File.ReadAllText($"{CarpetaSprites}/{hoja}.json"));
@@ -126,7 +139,7 @@ public static class ConstruirPercyJackson
         AnimationUtility.SetObjectReferenceCurve(clip,
             EditorCurveBinding.PPtrCurve("", typeof(SpriteRenderer), "m_Sprite"), claves);
         var ajustes = AnimationUtility.GetAnimationClipSettings(clip);
-        ajustes.loopTime = true;
+        ajustes.loopTime = bucle;
         AnimationUtility.SetAnimationClipSettings(clip, ajustes);
 
         AssetDatabase.DeleteAsset(ruta);
@@ -134,10 +147,16 @@ public static class ConstruirPercyJackson
         return clip;
     }
 
-    static AnimatorController CrearControlador(string ruta, AnimationClip clip)
+    // Un estado por animación; el primero es el de inicio. Sin transiciones: el script elige el estado.
+    static AnimatorController CrearControlador(string ruta, System.Collections.Generic.List<(string, AnimationClip)> estados)
     {
         AssetDatabase.DeleteAsset(ruta);
-        return AnimatorController.CreateAnimatorControllerAtPathWithClip(ruta, clip);
+        var ctrl = AnimatorController.CreateAnimatorControllerAtPath(ruta);
+        var maquina = ctrl.layers[0].stateMachine;
+        foreach (var (nombre, clip) in estados)
+            maquina.AddState(nombre).motion = clip;
+        maquina.defaultState = maquina.states[0].state;
+        return ctrl;
     }
 
     // ---------- Prefab y escena ----------
@@ -195,6 +214,16 @@ public static class ConstruirPercyJackson
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(CarpetaPrefabs + "/Heroe.prefab");
         Chk(prefab != null && prefab.transform.Find("Tridente") != null, "prefab Heroe con el tridente como hijo");
         Chk(File.Exists(RutaEscena), "escena principal guardada");
+        Chk(Sprites(CarpetaSprites + "/heroe_caminar.png").Length == 8 && Sprites(CarpetaSprites + "/tridente_caminar.png").Length == 8, "caminar: 8 sprites en héroe y tridente");
+        var caminar = AssetDatabase.LoadAssetAtPath<AnimationClip>("Assets/Animaciones/Heroe/caminar.anim");
+        Chk(caminar.isLooping && Mathf.Abs(caminar.length - 0.64f) < 0.015f, $"caminar en bucle, {caminar.length:0.00} s");
+        var aterrizar = AssetDatabase.LoadAssetAtPath<AnimationClip>("Assets/Animaciones/Heroe/aterrizar.anim");
+        Chk(!aterrizar.isLooping && Mathf.Abs(aterrizar.length - 0.17f) < 0.015f, $"aterrizar sin bucle, {aterrizar.length:0.00} s");
+        foreach (var c in new[] { "Heroe/Heroe", "Tridente/Tridente" })
+        {
+            var ctrl = AssetDatabase.LoadAssetAtPath<AnimatorController>($"Assets/Animaciones/{c}.controller");
+            Chk(ctrl.layers[0].stateMachine.states.Length == 6 && ctrl.layers[0].stateMachine.defaultState.name == "reposo", $"{c}.controller: 6 estados, empieza en reposo");
+        }
     }
 }
 #endif
