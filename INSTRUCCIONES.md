@@ -1,12 +1,14 @@
 # INSTRUCCIONES
 
-> Última actualización: 2026-10-15
+> Última actualización: 2026-11-14
 
 ## Abrir y probar el juego
 
 1. Abre Unity Hub → **Add** → elige esta carpeta. Usa Unity **6000.4.8f1**.
 2. Abre `Assets/Escenas/Principal.unity` y pulsa **Play**: el héroe respira y el tridente brilla cada 2 s.
-3. Para quitar el tridente: selecciona **Heroe** y desmarca **Con Tridente** en el componente *Heroe* (o desde código, `heroe.ConTridente = false`).
+3. **Prólogo (taller):** abre `Assets/Escenas/Prologo.unity` y pulsa Play. ← → / A D caminar, Espacio saltar, R reiniciar tras ganar. Se reconstruye con **Herramientas → Construir Prólogo** (después de *Construir Percy Jackson*, que hace el prefab).
+   - Para cambiar el arte o el recorrido: editar `Arte/Mapa/mapa.js` (y las mismas medidas en `ConstruirPrologo.cs`), revisar en `Arte/Mapa/revision/visual.html`, exportar con `python -I Arte\Mapa\exportar_mapa.py` y volver a construir.
+4. Para quitar el tridente: selecciona **Heroe** y desmarca **Con Tridente** en el componente *Heroe* (o desde código, `heroe.ConTridente = false`).
 
 ## Usar al héroe en otras escenas
 
@@ -26,6 +28,10 @@ Requisitos: el Aseprite compilado (`C:\Herramientas\Aseprite\aseprite.exe`) y Py
    python -I Arte\Heroe\revision\servidor.py 8766
    ```
    http://127.0.0.1:8766 — se puede votar, elegir favorita y comentar (se guarda en `Arte/Heroe/revision/opiniones.json`).
+   Caminar y saltar (como Naia) se generan aparte, sin tocar las animaciones ya aprobadas:
+   ```
+   aseprite -b --script-param dir="Arte\Heroe" --script Arte\Heroe\scripts\heroe_movimiento.lua
+   ```
 3. **Montar en Aseprite** las animaciones aprobadas (`heroe.aseprite` y `tridente/tridente.aseprite`):
    ```
    aseprite -b --script-param dir="Arte\Heroe" --script Arte\Heroe\scripts\heroe_final.lua
