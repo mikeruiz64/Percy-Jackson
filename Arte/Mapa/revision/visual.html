@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prólogo – diseño visual</title>
+<style>
+  :root { --fondo:#f4efe6; --texto:#1f2a37; --tarjeta:#fff; --borde:#d8cfc0; --dorado:#b8862b; --azul:#1f3a5f; }
+  body { margin:0; font:16px/1.5 system-ui, sans-serif; background:var(--fondo); color:var(--texto); }
+  main { max-width:1180px; margin:0 auto; padding:24px 16px 48px; }
+  h1 { color:var(--azul); margin:0 0 4px; }
+  .sub { color:#5b6573; margin:0 0 24px; }
+  .op { background:var(--tarjeta); border:1px solid var(--borde); border-radius:12px; padding:16px; margin-bottom:28px; }
+  .op h2 { margin:0 0 4px; color:var(--azul); }
+  .op h2 span { font-size:13px; background:var(--dorado); color:#fff; border-radius:999px; padding:2px 10px; margin-left:8px; vertical-align:middle; }
+  canvas { display:block; width:100%; height:auto; image-rendering:pixelated; border-radius:6px; margin:10px 0; }
+  .zoom { max-width:1152px; }
+  .pal { display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 0; }
+  .pal i { width:26px; height:26px; border-radius:4px; border:1px solid #0002; }
+  .et { font-size:13px; color:#5b6573; margin:8px 0 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Prólogo: diseño visual de la calle de Atenas</h1>
+  <p class="sub">Mismo recorrido (opción A) con tres estilos. Pixel art a 32 px por unidad, la misma escala que Alexios (su sprite real). Arriba, la primera pantalla ampliada ×2; abajo, el nivel completo.</p>
+  <div id="ops"></div>
+</main>
+<script src="../mapa.js"></script>
+<script>
+const heroe = new Image();
+heroe.src = '../../Heroe/heroe_base_con_tridente.png';
+const cont = document.getElementById('ops');
+cont.innerHTML = ESTILOS.map(e => `
+  <section class="op">
+    <h2>Estilo ${e.id}: ${e.nombre}${e.rec ? '<span>Recomendado</span>' : ''}</h2>
+    <p>${e.texto}</p>
+    <canvas class="zoom" id="z${e.id}" width="576" height="320"></canvas>
+    <canvas id="c${e.id}" width="${W}" height="${H}"></canvas>
+    <div class="pal">${[...e.cielo.slice(1, 5), e.piedra.base, e.piedra.sombra, e.casa.muro, e.casa.teja, e.marmol.base].map(c => `<i style="background:${c}" title="${c}"></i>`).join('')}</div>
+    <p class="et">Paleta principal</p>
+  </section>`).join('');
+function pintar() {
+  ESTILOS.forEach(e => {
+    const c = document.getElementById('c' + e.id); dibujar(c, e, heroe);
+    const z = document.getElementById('z' + e.id).getContext('2d');
+    z.imageSmoothingEnabled = false;
+    z.drawImage(c, px(-9.2), py(5), 576, 320, 0, 0, 576, 320); // primera pantalla (18 × 10 unidades)
+  });
+}
+heroe.onload = pintar; heroe.onerror = pintar;
+</script>
+</body>
+</html>

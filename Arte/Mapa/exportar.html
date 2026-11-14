@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Exportar mapa</title></head>
+<body>
+<!-- La abre exportar_mapa.py con Brave sin ventana y lee el JSON del bloque "salida" -->
+<pre id="salida"></pre>
+<script src="mapa.js"></script>
+<script>
+const estilo = ESTILOS.find(e => e.id === 'A'); // Amanecer dorado (elegido el 2026-11-14)
+
+function lienzo(capa) {
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  dibujar(c, estilo, null, { capa, pergaminos: false, santuario: false });
+  return c;
+}
+// Recorta una pieza; el pivote es el centro de su collider, para que en Unity encaje sola
+function recorte(c, cl, ct, cw, ch, centroX, centroY) {
+  const r = document.createElement('canvas'); r.width = cw; r.height = ch;
+  r.getContext('2d').drawImage(c, cl, ct, cw, ch, 0, 0, cw, ch);
+  const cx = (centroX - X0) * U, cy = (Y1 - centroY) * U;
+  return { png: r.toDataURL('image/png'), pivote: [(cx - cl) / cw, 1 - (cy - ct) / ch] };
+}
+
+const [gx, gy] = PERG[0];
+const [sx, sy, sw, sh] = SANT, sl = px(sx), sr = px(sx + sw), st = py(sy + sh), sb = py(sy);
+document.getElementById('salida').textContent = JSON.stringify({
+  nivel: { png: lienzo('todo').toDataURL('image/png'), pivote: [0, 0], origen: [X0, Y0] },
+  pergamino: recorte(lienzo('pergamino'), px(gx) - 1, py(gy + 0.55), 15, 18, gx + 0.2, gy + 0.275),
+  santuario: recorte(lienzo('santuario'), sl - 6, st - 4, sr - sl + 12, sb - st + 4, sx + sw / 2, sy + sh / 2),
+});
+</script>
+</body>
+</html>
