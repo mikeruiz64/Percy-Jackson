@@ -42,4 +42,4 @@ Unity 6 (URP 2D) · C# · Aseprite · JavaScript y Python (diseño y exportació
 
 ## Autor
 
-Michael Ruiz · [LinkedIn](https://www.linkedin.com/in/michael-ruiz-04244b370) · [GitHub](https://github.com/maxy26)
+Michael Ruiz · [LinkedIn](https://www.linkedin.com/in/michael-ruiz-04244b370) · [GitHub](https://github.com/mikeruiz64)
