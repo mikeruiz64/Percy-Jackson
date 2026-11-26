@@ -139,8 +139,8 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 45
-        height: 70
+        width: 104
+        height: 99
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -149,7 +149,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d1a15883502b3d043820f02f1ac94cfb
+      spriteID: 92739ea0e51f11642b6818707a11371b
       internalID: 977339611
       vertices: []
       indices: 
@@ -159,10 +159,10 @@ TextureImporter:
       name: heroe_caminar_01
       rect:
         serializedVersion: 2
-        x: 45
+        x: 104
         y: 0
-        width: 45
-        height: 70
+        width: 104
+        height: 99
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -171,7 +171,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f33b5adfa60b1ff4ca5b741162741ddb
+      spriteID: e138eb2e071b3c74ba0ecb44721733e1
       internalID: 63824702
       vertices: []
       indices: 
@@ -181,10 +181,10 @@ TextureImporter:
       name: heroe_caminar_02
       rect:
         serializedVersion: 2
-        x: 90
+        x: 208
         y: 0
-        width: 45
-        height: 70
+        width: 104
+        height: 99
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -193,7 +193,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 25f958f2ed8648945b4310ee7a40a18f
+      spriteID: 974fc05058a7c6940a34c7ca773b058e
       internalID: -309763515
       vertices: []
       indices: 
@@ -203,10 +203,10 @@ TextureImporter:
       name: heroe_caminar_03
       rect:
         serializedVersion: 2
-        x: 135
+        x: 312
         y: 0
-        width: 45
-        height: 70
+        width: 104
+        height: 99
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -215,7 +215,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a0d791300f393704ab2eaa7a298646e6
+      spriteID: 5bf01ea7b9c48c34099d3b659e17d503
       internalID: 1714921991
       vertices: []
       indices: 
@@ -225,10 +225,10 @@ TextureImporter:
       name: heroe_caminar_04
       rect:
         serializedVersion: 2
-        x: 180
+        x: 416
         y: 0
-        width: 45
-        height: 70
+        width: 104
+        height: 99
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -237,7 +237,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 02e9dbe964988fc47b7af472ed0d80ce
+      spriteID: a02b62d0ddc3e3b4eba8830675392fe7
       internalID: -957546527
       vertices: []
       indices: 
@@ -247,10 +247,10 @@ TextureImporter:
       name: heroe_caminar_05
       rect:
         serializedVersion: 2
-        x: 225
+        x: 520
         y: 0
-        width: 45
-        height: 70
+        width: 104
+        height: 99
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -259,7 +259,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4f470d31ee6ca6e4e9158d0e81b54f78
+      spriteID: 868dca221beed8d48827295e513a088c
       internalID: 876322579
       vertices: []
       indices: 
@@ -269,10 +269,10 @@ TextureImporter:
       name: heroe_caminar_06
       rect:
         serializedVersion: 2
-        x: 270
+        x: 624
         y: 0
-        width: 45
-        height: 70
+        width: 104
+        height: 99
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -281,7 +281,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 461b447dac1f11e4c9bafad03ae6ec27
+      spriteID: 6c53adfac540d0d48981413eeecd0e7d
       internalID: -612017727
       vertices: []
       indices: 
@@ -291,10 +291,10 @@ TextureImporter:
       name: heroe_caminar_07
       rect:
         serializedVersion: 2
-        x: 315
+        x: 728
         y: 0
-        width: 45
-        height: 70
+        width: 104
+        height: 99
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -303,7 +303,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 73959d86759e80b489da2db8c6ae3238
+      spriteID: c7bcaf653edc0294b8d20e19fb10ff0a
       internalID: 1458400396
       vertices: []
       indices: 

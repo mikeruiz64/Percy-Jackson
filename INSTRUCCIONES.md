@@ -1,21 +1,26 @@
 # INSTRUCCIONES
 
-> Última actualización: 2026-11-14
+> Última actualización: 2026-11-16
 
 ## Abrir y probar el juego
 
 1. Abre Unity Hub → **Add** → elige esta carpeta. Usa Unity **6000.4.8f1**.
-2. Abre `Assets/Escenas/Principal.unity` y pulsa **Play**: el héroe respira y el tridente brilla cada 2 s.
-3. **Prólogo (taller):** abre `Assets/Escenas/Prologo.unity` y pulsa Play. ← → / A D caminar, Espacio saltar, R reiniciar tras ganar. Se reconstruye con **Herramientas → Construir Prólogo** (después de *Construir Percy Jackson*, que hace el prefab).
+2. Abre `Assets/Escenas/Principal.unity` y pulsa **Play**: se ve a Alexios en reposo.
+3. **Prólogo (taller):** abre `Assets/Escenas/Prologo.unity` y pulsa Play. Empieza en el menú (↑ ↓ y Enter). ← → / A D caminar, Shift correr, Espacio saltar, J atacar con la daga, Esc pausa, R reiniciar tras ganar. La partida se guarda al pasar por los puntos de control (`%USERPROFILE%\AppData\LocalLow\DefaultCompany\Los Herederos del Olimpo\partida.json`). Se reconstruye con **Herramientas → Construir Prólogo** (después de *Construir Percy Jackson*, que hace el prefab).
    - Para cambiar el arte o el recorrido: editar `Arte/Mapa/mapa.js` (y las mismas medidas en `ConstruirPrologo.cs`), revisar en `Arte/Mapa/revision/visual.html`, exportar con `python -I Arte\Mapa\exportar_mapa.py` y volver a construir.
-4. Para quitar el tridente: selecciona **Heroe** y desmarca **Con Tridente** en el componente *Heroe* (o desde código, `heroe.ConTridente = false`).
 
 ## Usar al héroe en otras escenas
 
 - Arrastra `Assets/Prefabs/Heroe.prefab` a la escena. Su pivote está en los pies.
-- Para mirar al otro lado: escala X negativa en el objeto **Heroe** (el tridente, que es hijo, se refleja con él).
+- Para mirar al otro lado: escala X negativa en el objeto **Heroe**.
 
-## Crear o cambiar animaciones del héroe
+## Animaciones del protagonista (diseño actual)
+
+1. **Ver y comparar:** `python -m http.server 8765 --bind 127.0.0.1` en la carpeta del proyecto y abrir en Brave http://127.0.0.1:8765/Arte/Nuevo/revision/index.html (vista previa jugable) o `.../daga.html` (propuestas de limpieza y daga).
+2. **Exportar al juego:** `python -I Arte\Nuevo\scripts\exportar_unity.py` (crea `heroe_*` y `heroe_tridente_*` en `Assets/Sprites/Heroe/`).
+3. **Construir:** *Herramientas → Construir Percy Jackson* y después *Construir Prólogo*.
+
+## Diseño anterior (de frente, sin uso)
 
 Requisitos: el Aseprite compilado (`C:\Herramientas\Aseprite\aseprite.exe`) y Python 3. Las rutas son relativas a la carpeta del proyecto.
 

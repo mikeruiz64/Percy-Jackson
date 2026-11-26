@@ -80,6 +80,10 @@ public static class ConstruirPrologo
         santuario.tag = "Santuario";
         santuario.GetComponent<SpriteRenderer>().color = SantuarioCerrado;
 
+        // Puntos de control (invisibles por ahora): al pasar se guarda la partida
+        Pieza("PuntoControl1", null, 10.4f, -2.5f, 0.6f, 3f, true).AddComponent<PuntoControl>();
+        Pieza("PuntoControl2", null, 24.4f, 0.5f, 0.6f, 3f, true).AddComponent<PuntoControl>();
+
         // Alexios: prefab del héroe + física + script de la mecánica
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Heroe.prefab");
         var heroe = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
@@ -204,6 +208,12 @@ public static class ConstruirPrologo
         Chk(Camera.main.GetComponent<CamaraSigue>().objetivo == a.transform, "la cámara sigue a Alexios");
         Chk(GameObject.Find("Fondo").GetComponent<SpriteRenderer>().sprite != null, "fondo del nivel con su imagen");
         Chk(GameObject.Find("Santuario").GetComponent<SpriteRenderer>().sprite != null, "santuario con su sprite");
+        Chk(Object.FindObjectsByType<PuntoControl>(FindObjectsSortMode.None).Length == 2, "2 puntos de control");
+        var partida = new Guardado.Partida { nivel = "Prologo", x = 1.5f };
+        partida.pergaminos.Add("Pergamino2");
+        var leida = JsonUtility.FromJson<Guardado.Partida>(JsonUtility.ToJson(partida));
+        Chk(leida.nivel == "Prologo" && leida.x == 1.5f && leida.pergaminos.Count == 1 && leida.pergaminos[0] == "Pergamino2",
+            "la partida se guarda y se lee igual");
         Chk(File.Exists(RutaEscena), "escena Prologo guardada");
     }
 }

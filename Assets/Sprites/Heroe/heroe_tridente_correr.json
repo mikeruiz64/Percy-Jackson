@@ -1,0 +1,93 @@
+{
+ "frames": [
+  {
+   "filename": "correr 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 1",
+   "frame": {
+    "x": 134,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 2",
+   "frame": {
+    "x": 268,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 3",
+   "frame": {
+    "x": 402,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 4",
+   "frame": {
+    "x": 536,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 5",
+   "frame": {
+    "x": 670,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 6",
+   "frame": {
+    "x": 804,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 7",
+   "frame": {
+    "x": 938,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 60
+  }
+ ],
+ "meta": {
+  "image": "heroe_tridente_correr.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1072,
+   "h": 79
+  },
+  "scale": "1"
+ }
+}

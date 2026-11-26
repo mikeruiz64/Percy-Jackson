@@ -11,6 +11,87 @@
 
 ---
 
+## AUD-008 — 2026-11-26 — Cambio de usuario de GitHub y limpieza del historial
+**Alcance:** repositorio de GitHub. · **Hallazgos:** el usuario de GitHub pasó de maxy26 a mikeruiz64 y el remoto seguía apuntando al nombre viejo; los dos commits del 19/11 (README y enlaces) tenían líneas de coautoría en el mensaje. · **Riesgos:** la copia local va 2 commits por detrás de GitHub; tiene cambios preparados, por eso no se actualizó. · **Acciones:** remoto cambiado a github.com/mikeruiz64/Percy-Jackson; mensajes de los dos commits limpiados y subidos con --force-with-lease (mismo contenido). · **Estado:** cerrado (git pull hecho el 2026-11-26; llegó README.md, sin tocar los cambios locales).
+
+## AUD-007 — 2026-11-16 — Fase 1: base del juego
+
+**Alcance:** primera fase de la propuesta aprobada. También se actualiza la propuesta con las respuestas del usuario (sin acertijos, sin puntos, estatua de Atenea).
+
+**Decisiones:**
+- `Juego` se crea con `RuntimeInitializeOnLoadMethod` y no se destruye: no hay que añadirlo a cada escena.
+- El menú es una capa sobre el nivel, no una escena aparte.
+- En el fotograma en que cambia el estado se ignoran las entradas, para que la tecla que cierra un menú no haga saltar a Alexios.
+- El guardado se escribe primero en un archivo temporal.
+- "Continuar" vuelve a leer el archivo: lo recogido después del último punto de control se pierde, como en la propuesta.
+- El menú solo enseña opciones que funcionan (Continuar, Nueva partida, Salir); Códice y Opciones llegarán con sus fases.
+
+**Pruebas:**
+- `ConstruirPrologo`: 10/10 [OK], con 2 puntos de control y lectura/escritura de la partida.
+- Fallo encontrado y corregido en la prueba: al continuar, Alexios quedaba parado con pose de salto. El cuerpo se dormía y dejaba de recibir `OnCollisionStay2D`; ahora no se duerme nunca (`NeverSleep`).
+- `.exe` con teclas simuladas: menú, nueva partida, pausa y vuelta, guardado en el punto de control con un pergamino, "Continuar" en el menú y reaparición en el punto con 1 / 3.
+
+**Riesgos y límites:**
+- El mando no se ha probado (no hay uno conectado).
+- La fuente es Georgia del sistema: en Android no existe.
+- Los puntos de control son invisibles hasta que haya arte.
+- El ratón elige opciones pero no las resalta al pasar.
+
+**Estado:** abierta hasta que el usuario lo juegue.
+
+---
+
+## AUD-006 — 2026-11-16 — Propuesta de diseño: Prólogo + Capítulo 1
+
+**Alcance:** diseño general de la primera fase jugable, a partir de la ficha conceptual y del guion de la materia. Solo propuesta: no se ha cambiado el juego.
+
+**Decisiones del usuario:**
+- Alcance: Prólogo + Capítulo 1.
+- El arte lo aporta él.
+- Niveles largos con cámara.
+- Objetivo del Prólogo: Thales da la misión, tres habitantes dan pistas, tres pergaminos abren el santuario.
+- La daga rompe objetos; sin enemigos en esta fase.
+- PC ahora y Android después. Sin fecha de entrega.
+
+**Entregado:** `Arte/Diseno/revision/index.html` con pantallas de ejemplo, recorrido, mapas, reglas, textos del códice, lista de imágenes, sonido, orden de trabajo y 8 preguntas abiertas.
+
+**Riesgos y límites:**
+- Los textos del códice son borradores sin revisar por quien lleva la investigación.
+- El avance del arte depende de las imágenes del usuario.
+
+**Estado:** abierta hasta que el usuario apruebe la propuesta.
+
+---
+
+## AUD-005 — 2026-11-16 — Alexios nuevo: hojas del usuario, limpieza B y daga
+
+**Alcance:** sustitución del protagonista por las hojas de animaciones del usuario (de perfil, con capa), a petición suya. Se cambian decisiones cerradas de `CONTEXTO_PERSONAJE.md`.
+
+**Decisiones:**
+- Recorte automático en el navegador (`recorte.js`):
+  - Se quita el fondo azul marino rellenando desde el borde; el pelo negro se conserva porque no es azulado.
+  - Los fotogramas se separan por las columnas más vacías.
+  - En cada celda se queda la pieza mayor más las suyas.
+- Limpieza "B · Pixel art", elegida por el usuario: escala al 72 %, paleta fija sin negro, contorno de 1 px y sin píxeles sueltos.
+- Daga: la hoja gris de la espada se corta a 14 px, se borra su contorno y se dibuja una punta.
+- Todos los fotogramas comparten celda con la cabeza centrada, para que no bailen con el pivote en los pies.
+- Se eliminan el tridente aparte, `Heroe.cs` y `Animaciones/Tridente`. Se añaden correr (Shift) y atacar (J) en `Alexios.cs`.
+
+**Pruebas:**
+- Exportación: 30 hojas con las cuentas de fotogramas esperadas.
+- `ConstruirPercyJackson`: 21/21 [OK]. `ConstruirPrologo`: 8/8 [OK].
+- Compilación de Windows correcta; captura del juego: Alexios en el suelo, a buen tamaño.
+
+**Riesgos y límites:**
+- Las hojas son JPEG de WhatsApp: el script no añade detalle.
+- El reposo es un solo fotograma.
+- El escenario sigue siendo el de AUD-003, no la imagen de Atenas.
+- No se ha jugado entero: correr a 9 u/s puede cambiar qué saltos se alcanzan.
+
+**Estado:** abierta hasta que el usuario lo juegue.
+
+---
+
 ## AUD-004 — 2026-11-14 — Caminar y saltar como Naia
 
 **Alcance:** animaciones de movimiento de Alexios tomando como modelo las de Naia (`Juego Naia/04_Arte/Sprites_Oficiales/Naia/agua`).

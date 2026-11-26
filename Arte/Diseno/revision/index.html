@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Los Herederos del Olimpo · propuesta de diseño</title>
+<style>
+  :root { --noche:#0f1626; --panel:#17213a; --panel2:#1f2c4d; --oro:#d9a84a; --oro2:#f3d68a; --marfil:#f2e9d2; --tinta:#2a2118; --perg:#ead9b0; --rojo:#b5482f; --verde:#3f9b5a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--noche); color:var(--marfil); font-family:Georgia, 'Times New Roman', serif; line-height:1.5; }
+  header, main { max-width:1180px; margin:0 auto; padding:16px; }
+  h1 { color:var(--oro); font-weight:normal; font-size:34px; margin:12px 0 4px; letter-spacing:1px; }
+  h2 { color:var(--oro); font-weight:normal; font-size:24px; margin:44px 0 6px; border-bottom:1px solid #3a4666; padding-bottom:6px; }
+  h3 { color:var(--oro2); font-weight:normal; font-size:18px; margin:18px 0 6px; }
+  p, li { max-width:78ch; }
+  .nota { opacity:.8; font-size:15px; }
+  .aviso { background:#2a2233; border-left:4px solid var(--oro); padding:10px 14px; border-radius:4px; margin:12px 0; }
+  nav { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; }
+  nav a { color:var(--marfil); text-decoration:none; border:1px solid var(--oro); border-radius:5px; padding:5px 11px; font-size:15px; }
+  nav a:hover { background:var(--oro); color:#1a1205; }
+
+  /* --- Pantallas de ejemplo --- */
+  .pestanas { display:flex; flex-wrap:wrap; gap:6px; margin:12px 0; }
+  .pestanas button { background:var(--panel); color:var(--marfil); border:1px solid var(--oro); border-radius:5px; padding:6px 12px; font:inherit; cursor:pointer; }
+  .pestanas button.activa { background:var(--oro); color:#1a1205; }
+  .pantalla { position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; border:2px solid var(--oro); border-radius:6px; container-type:inline-size; background:#223 url('../../../Assets/Sprites/Mapa/WhatsApp%20Image%202026-11-14%20at%2020.25.32.jpeg') center/cover; image-rendering:pixelated; display:none; }
+  .pantalla.visible { display:block; }
+  .pantalla * { image-rendering:auto; }
+  .velo { position:absolute; inset:0; background:rgba(10,14,28,.62); }
+  .tapa-hud { position:absolute; left:0; top:0; width:28%; height:10.5%; background:#1d2a4d; }
+  .marco { background:linear-gradient(#22315a,#18233f); border:.35cqw solid var(--oro); border-radius:.8cqw; box-shadow:0 0 0 .15cqw #6b4a17 inset, 0 .4cqw 1cqw rgba(0,0,0,.5); color:var(--marfil); }
+  .hud { position:absolute; left:1.5cqw; top:1.2cqw; display:flex; gap:1cqw; align-items:center; }
+  .hud .marco { padding:.6cqw 1.3cqw; font-size:2cqw; }
+  .objetivo { position:absolute; right:1.5cqw; top:1.2cqw; padding:.6cqw 1.2cqw; font-size:1.5cqw; max-width:34cqw; }
+  .objetivo b { color:var(--oro2); font-weight:normal; display:block; font-size:1.2cqw; letter-spacing:.1cqw; }
+  .tecla { display:inline-block; background:var(--marfil); color:var(--tinta); border-radius:.4cqw; padding:0 .7cqw; font-family:monospace; font-weight:bold; border-bottom:.25cqw solid #9a8a63; }
+  .aviso-tecla { position:absolute; padding:.4cqw 1cqw; font-size:1.5cqw; white-space:nowrap; }
+  .npc { position:absolute; width:6.5cqw; height:22cqh; border-radius:3cqw 3cqw .6cqw .6cqw; background:repeating-linear-gradient(45deg,#3a4a78 0 1cqw,#32406a 1cqw 2cqw); border:.25cqw dashed var(--oro2); display:flex; align-items:center; justify-content:center; text-align:center; font-size:1.05cqw; color:var(--oro2); }
+  .dialogo { position:absolute; left:4cqw; right:4cqw; bottom:2.5cqw; padding:1.6cqw 2cqw 1.6cqw 17cqw; min-height:15cqw; font-size:2.05cqw; }
+  .retrato { position:absolute; left:1.4cqw; bottom:1.4cqw; width:13.5cqw; height:12cqw; border:.3cqw solid var(--oro); border-radius:.6cqw; background:repeating-linear-gradient(45deg,#3a4a78 0 1cqw,#32406a 1cqw 2cqw); display:flex; align-items:center; justify-content:center; font-size:1.1cqw; color:var(--oro2); text-align:center; }
+  .nombre { position:absolute; left:17cqw; top:-1.9cqw; background:var(--oro); color:#1a1205; padding:.2cqw 1.4cqw; border-radius:.5cqw; font-size:1.7cqw; }
+  .seguir { position:absolute; right:1.6cqw; bottom:1cqw; font-size:1.4cqw; color:var(--oro2); }
+  .centro { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); text-align:center; }
+  .titulo-juego { font-size:6.2cqw; color:var(--oro2); letter-spacing:.4cqw; text-shadow:0 .3cqw 0 #5a3c10, 0 .8cqw 1.6cqw #000; line-height:1.05; }
+  .sub { font-size:1.6cqw; letter-spacing:.5cqw; color:var(--marfil); margin:.6cqw 0 2.4cqw; }
+  .menu div { font-size:2.2cqw; padding:.5cqw 3cqw; margin:.5cqw auto; width:30cqw; }
+  .menu .sel { background:var(--oro); color:#1a1205; border-radius:.6cqw; }
+  .menu .off { opacity:.45; }
+  .pregunta { position:absolute; left:8cqw; right:8cqw; top:5cqw; padding:1.6cqw 2.4cqw; font-size:2.3cqw; text-align:center; }
+  .pregunta small { display:block; color:var(--oro2); font-size:1.4cqw; letter-spacing:.2cqw; }
+  .opciones { position:absolute; left:8cqw; right:8cqw; top:21cqw; display:grid; grid-template-columns:repeat(3,1fr); gap:2.4cqw; }
+  .opcion { padding:1.4cqw; text-align:center; font-size:2.2cqw; }
+  .opcion .dib { height:13cqw; border-radius:.6cqw; margin-bottom:1cqw; background:repeating-linear-gradient(45deg,#3a4a78 0 1cqw,#32406a 1cqw 2cqw); border:.25cqw dashed var(--oro2); display:flex; align-items:center; justify-content:center; font-size:1.2cqw; color:var(--oro2); }
+  .opcion.sel { border-color:var(--oro2); box-shadow:0 0 0 .4cqw rgba(243,214,138,.45), 0 .4cqw 1cqw rgba(0,0,0,.5); transform:translateY(-.6cqw); }
+  .pista { position:absolute; left:8cqw; right:8cqw; bottom:2.2cqw; text-align:center; font-size:1.5cqw; color:var(--oro2); }
+  .libro { position:absolute; inset:5cqw 7cqw; background:var(--perg); color:var(--tinta); border:.5cqw solid #6b4a17; border-radius:.8cqw; display:grid; grid-template-columns:30% 70%; box-shadow:0 1cqw 2cqw rgba(0,0,0,.6); }
+  .libro .indice { border-right:.2cqw solid #b89a5e; padding:1.6cqw; font-size:1.55cqw; }
+  .libro .indice h4 { margin:0 0 1cqw; font-size:2.2cqw; font-weight:normal; color:#6b3d12; }
+  .libro .indice div { padding:.45cqw .8cqw; border-radius:.4cqw; }
+  .libro .indice .sel { background:#d2b877; }
+  .libro .indice .bloq { opacity:.45; }
+  .libro .hoja { padding:1.8cqw 2.4cqw; font-size:1.6cqw; }
+  .libro .hoja h4 { margin:0 0 .6cqw; font-size:2.5cqw; font-weight:normal; color:#6b3d12; }
+  .etq { display:inline-block; font-size:1.15cqw; padding:.1cqw .9cqw; border-radius:1cqw; color:#fff; margin-right:.6cqw; letter-spacing:.08cqw; }
+  .etq.h { background:#3d6a8a; } .etq.m { background:#8a4a7a; }
+  .premio { padding:2.6cqw 4cqw; font-size:2cqw; width:54cqw; }
+  .premio .medalla { width:11cqw; height:11cqw; border-radius:50%; margin:0 auto 1.4cqw; background:radial-gradient(circle at 35% 30%, #fff1b8, #d9a84a 55%, #7a5416); border:.5cqw solid #6b4a17; display:flex; align-items:center; justify-content:center; font-size:1.1cqw; color:#3a2608; }
+  .premio h4 { margin:0; font-size:3.2cqw; font-weight:normal; color:var(--oro2); }
+
+  /* --- Mapas --- */
+  svg.mapa { width:100%; height:auto; background:#141c33; border:1px solid #3a4666; border-radius:6px; }
+  svg text { font-family:Georgia, serif; }
+  .leyenda { display:flex; flex-wrap:wrap; gap:14px; font-size:14px; margin:8px 0; }
+  .leyenda span::before { content:''; display:inline-block; width:12px; height:12px; border-radius:2px; margin-right:6px; vertical-align:-1px; background:var(--c); }
+
+  table { border-collapse:collapse; width:100%; margin:10px 0; font-size:15.5px; }
+  th { text-align:left; color:var(--oro2); font-weight:normal; border-bottom:1px solid var(--oro); padding:6px 8px; }
+  td { border-bottom:1px solid #2c3858; padding:6px 8px; vertical-align:top; }
+  td:first-child { white-space:nowrap; color:var(--oro2); }
+  code { background:#0a1020; padding:1px 5px; border-radius:3px; font-size:13.5px; }
+  .dos { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:18px; }
+  .caja { background:var(--panel); border:1px solid #3a4666; border-radius:6px; padding:12px 16px; }
+  .caja h3 { margin-top:2px; }
+  ol.fases li { margin:8px 0; }
+  .pend { color:#ffcf6a; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Los Herederos del Olimpo</h1>
+  <p>Propuesta de diseño para la primera fase jugable: <b>Prólogo + Capítulo 1</b>. Nada de esto está hecho todavía en el juego: es para que lo veas, me corrijas y decidas.</p>
+  <p class="nota">Ya decidido por ti: Prólogo + Capítulo 1 · el arte me lo pasas tú · niveles largos con cámara · objetivo mezclando guion y taller · la daga rompe objetos, sin enemigos · PC ahora y Android después · sin fecha.</p>
+  <nav>
+    <a href="#pantallas">1 · Pantallas</a><a href="#recorrido">2 · Recorrido</a><a href="#mapas">3 · Mapas</a><a href="#reglas">4 · Reglas</a>
+    <a href="#codice">5 · Códice</a><a href="#imagenes">6 · Imágenes que necesito</a><a href="#sonido">7 · Sonido</a><a href="#orden">8 · Orden de trabajo</a><a href="#dudas">9 · Tus respuestas</a>
+  </nav>
+</header>
+<main>
+
+<h2 id="pantallas">1 · Cómo se vería</h2>
+<p>Siete pantallas de ejemplo montadas sobre tu imagen de Atenas, con tu marco azul y dorado como estilo de toda la interfaz. Los recuadros rayados son huecos donde irá una imagen que todavía no existe.</p>
+<div class="pestanas" id="pestanas"></div>
+
+<div class="pantalla visible" data-nombre="Menú principal">
+  <div class="velo"></div>
+  <div class="centro">
+    <div class="titulo-juego">LOS HEREDEROS<br>DEL OLIMPO</div>
+    <div class="sub">LA MEMORIA DE LA HÉLADE</div>
+    <div class="menu marco" style="padding:1cqw 0">
+      <div class="sel">Nueva partida</div><div class="off">Continuar</div><div>Códice</div><div>Opciones</div><div>Salir</div>
+    </div>
+  </div>
+</div>
+
+<div class="pantalla" data-nombre="Jugando">
+  <div class="tapa-hud"></div>
+  <div class="hud"><div class="marco">📜 Pergaminos 1 / 3</div><div class="marco">🗣 Habitantes 1 / 3</div></div>
+  <div class="objetivo marco"><b>OBJETIVO</b>Habla con los habitantes de Atenas</div>
+  <div class="npc" style="left:24cqw; top:62cqh">Habitante<br>(falta imagen)</div>
+  <div class="aviso-tecla marco" style="left:21.5cqw; top:52cqh"><span class="tecla">E</span> Hablar</div>
+</div>
+
+<div class="pantalla" data-nombre="Diálogo">
+  <div class="tapa-hud"></div>
+  <div class="npc" style="left:24cqw; top:62cqh">Thales<br>(falta imagen)</div>
+  <div class="dialogo marco">
+    <div class="retrato">Retrato de Thales<br>(falta imagen)</div>
+    <div class="nombre">Thales</div>
+    Ayer todos lo conocían. Hoy hasta los escribas han olvidado su historia.
+    <div class="seguir"><span class="tecla">E</span> Continuar</div>
+  </div>
+</div>
+
+<div class="pantalla" data-nombre="Examinar relieve">
+  <div class="velo"></div>
+  <div class="pregunta marco"><small>RELIEVE DEL TEMPLO · 2 DE 3</small>Un búho posado sobre una rama de olivo</div>
+  <div class="opciones" style="grid-template-columns:1fr; left:30cqw; right:30cqw">
+    <div class="opcion marco"><div class="dib">Relieve del búho (falta imagen)</div>Nueva entrada en el códice</div>
+  </div>
+  <div class="pista"><span class="tecla">E</span> Continuar · <span class="tecla">Tab</span> Abrir el códice</div>
+</div>
+
+<div class="pantalla" data-nombre="Códice">
+  <div class="velo"></div>
+  <div class="libro">
+    <div class="indice">
+      <h4>Códice</h4>
+      <div>Las ánforas</div><div>El Partenón</div><div>Los pergaminos</div><div class="sel">Atenea y sus símbolos</div>
+      <div class="bloq">🔒 El ágora</div><div class="bloq">🔒 Esparta</div><div class="bloq">🔒 Teseo y el minotauro</div>
+    </div>
+    <div class="hoja">
+      <h4>Atenea y sus símbolos</h4>
+      <p><span class="etq m">MITO</span>Atenea es la diosa griega de la sabiduría, la estrategia y los oficios. Según el mito, ganó el patronazgo de Atenas al regalar a la ciudad el primer olivo.</p>
+      <p><span class="etq h">DATO HISTÓRICO</span>El búho (un mochuelo) era su símbolo y aparecía en las monedas de plata de Atenas, junto a una rama de olivo.</p>
+      <p style="opacity:.7">Descubierto en: Capítulo 1 · Templo de Atenea</p>
+    </div>
+  </div>
+</div>
+
+<div class="pantalla" data-nombre="Recompensa">
+  <div class="velo"></div>
+  <div class="centro premio marco">
+    <div class="medalla">Medallón<br>(falta imagen)</div>
+    <h4>Medallón de sabiduría</h4>
+    <p style="margin:.6cqw 0 1.4cqw">La puerta del templo se abre.<br>Nueva entrada en el códice: <i>Atenea y sus símbolos</i></p>
+    <span class="tecla">E</span> Continuar
+  </div>
+</div>
+
+<div class="pantalla" data-nombre="Pausa">
+  <div class="velo"></div>
+  <div class="centro">
+    <div class="sub" style="font-size:2.4cqw; margin-bottom:1.4cqw">PAUSA</div>
+    <div class="menu marco" style="padding:1cqw 0">
+      <div class="sel">Seguir jugando</div><div>Códice</div><div>Controles</div><div>Opciones</div><div>Volver al menú</div>
+    </div>
+  </div>
+</div>
+
+<h2 id="recorrido">2 · Recorrido del jugador</h2>
+<p>De 5 a 10 minutos de juego, como pide vuestro guion para el primer prototipo.</p>
+<table>
+  <tr><th>Paso</th><th>Qué hace el jugador</th><th>Qué aprende (juego / Grecia)</th></tr>
+  <tr><td>Menú</td><td>Nueva partida. Texto corto de introducción: la niebla borra los recuerdos de la Hélade.</td><td>—</td></tr>
+  <tr><td>Prólogo 1</td><td>Aparece en la plaza. Camina hasta Thales y habla con él (diálogo del guion). Thales le encarga ir al santuario.</td><td>Caminar e interactuar.</td></tr>
+  <tr><td>Prólogo 2</td><td>Calle de las casas. La alfarera le habla de las ánforas y le dice que vio un pergamino en el tejado. Sube saltando.</td><td>Saltar. Para qué servían las ánforas.</td></tr>
+  <tr><td>Prólogo 3</td><td>Pórtico. El escriba ha olvidado el nombre del templo de la colina; su pergamino está sobre el dintel.</td><td>Salto preciso. El Partenón.</td></tr>
+  <tr><td>Prólogo 4</td><td>Escalinata. El niño cuenta que guardó un pergamino dentro de un ánfora. Hay que romperla con la daga.</td><td>Atacar. Cómo se escribía y guardaba un texto.</td></tr>
+  <tr><td>Prólogo 5</td><td>Con los 3 pergaminos el santuario se ilumina y la puerta se abre. Se desbloquea el códice.</td><td>Abrir el códice.</td></tr>
+  <tr><td>Capítulo 1</td><td>Interior del templo. La estatua de Atenea brilla y habla con Alexios (diálogo del guion): le pide observar el santuario. Alexios examina los tres relieves; cada uno añade su dato al códice.</td><td>Examinar. Símbolos de Atenea: olivo, búho y escudo.</td></tr>
+  <tr><td>Final</td><td>Con los tres relieves vistos, la estatua brilla con más fuerza, se abre la puerta y entrega el medallón. Pantalla de "Fin del primer capítulo".</td><td>—</td></tr>
+</table>
+
+<h2 id="mapas">3 · Mapas de los dos niveles</h2>
+<h3>Prólogo · Calle de Atenas al amanecer (unas 4 pantallas de ancho)</h3>
+<div class="leyenda">
+  <span style="--c:#c9a66b">Suelo y plataformas</span><span style="--c:#7fb0ff">Personaje para hablar</span><span style="--c:#f3d68a">Pergamino</span><span style="--c:#c4623a">Ánfora que se rompe</span><span style="--c:#9be29b">Punto de control</span>
+</div>
+<svg class="mapa" viewBox="0 0 1160 300">
+  <defs><linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3a67"/><stop offset=".6" stop-color="#a06a8c"/><stop offset="1" stop-color="#f0b27a"/></linearGradient></defs>
+  <rect width="1160" height="300" fill="url(#cielo)" opacity=".55"/>
+  <g fill="#c9a66b" stroke="#7a5a2c">
+    <rect x="0" y="250" width="560" height="50"/>
+    <rect x="560" y="225" width="150" height="75"/>
+    <rect x="710" y="195" width="130" height="105"/>
+    <rect x="840" y="160" width="320" height="140"/>
+    <rect x="250" y="175" width="110" height="75" fill="#e8dcc0"/><polygon points="240,175 370,175 355,158 255,158" fill="#b5482f"/>
+    <rect x="470" y="150" width="10" height="100" fill="#e8dcc0"/><rect x="540" y="150" width="10" height="100" fill="#e8dcc0"/><rect x="460" y="138" width="100" height="12" fill="#e8dcc0"/>
+    <rect x="1010" y="80" width="110" height="80" fill="#e8dcc0"/><polygon points="1000,80 1130,80 1065,48" fill="#e8dcc0"/>
+  </g>
+  <g fill="#7fb0ff"><circle cx="110" cy="232" r="11"/><circle cx="215" cy="232" r="11"/><circle cx="430" cy="232" r="11"/><circle cx="640" cy="207" r="11"/></g>
+  <g fill="#f3d68a" stroke="#6b4a17"><rect x="296" y="140" width="14" height="14"/><rect x="503" y="120" width="14" height="14"/></g>
+  <g fill="#c4623a" stroke="#5a2a14"><ellipse cx="170" cy="240" rx="8" ry="11"/><ellipse cx="400" cy="240" rx="8" ry="11"/><ellipse cx="775" cy="184" rx="8" ry="11"/><ellipse cx="800" cy="184" rx="8" ry="11"/></g>
+  <rect x="790" y="150" width="12" height="12" fill="#f3d68a" stroke="#6b4a17" stroke-dasharray="3 2"/>
+  <g fill="#9be29b"><rect x="575" y="205" width="6" height="20"/><rect x="855" y="140" width="6" height="20"/></g>
+  <g fill="#f2e9d2" font-size="13" text-anchor="middle">
+    <text x="60" y="275">INICIO</text><text x="110" y="212">Thales</text><text x="215" y="212">Alfarera</text><text x="305" y="132">Pergamino 1</text>
+    <text x="430" y="212">Escriba</text><text x="510" y="112">Pergamino 2</text><text x="640" y="187">Niño</text>
+    <text x="790" y="140">Pergamino 3 (dentro del ánfora)</text><text x="1065" y="72">SANTUARIO</text><text x="1065" y="182">Puerta: se abre con 3 pergaminos</text>
+  </g>
+  <g fill="#f3d68a" font-size="12" text-anchor="middle" opacity=".9">
+    <text x="130" y="292">1 · Plaza: caminar y hablar</text><text x="330" y="292">2 · Casas: saltar</text><text x="510" y="292">3 · Pórtico: salto preciso</text><text x="700" y="292">4 · Escalinata: atacar</text><text x="1000" y="292">5 · Colina del santuario</text>
+  </g>
+</svg>
+<p class="nota">Es el mismo recorrido "Calle hacia la colina" que ya elegiste, con los personajes y las ánforas añadidos. Cada zona enseña una sola cosa nueva, en orden. Las alturas se ajustan al salto real de Alexios cuando esté el arte.</p>
+
+<h3>Capítulo 1 · Templo de Atenea (unas 2 pantallas de ancho)</h3>
+<svg class="mapa" viewBox="0 0 1160 260">
+  <rect width="1160" height="260" fill="#1b2440"/>
+  <g fill="#c9a66b" stroke="#7a5a2c"><rect x="0" y="215" width="1160" height="45"/>
+    <g fill="#e8dcc0"><rect x="150" y="60" width="16" height="155"/><rect x="330" y="60" width="16" height="155"/><rect x="510" y="60" width="16" height="155"/><rect x="820" y="60" width="16" height="155"/><rect x="0" y="44" width="1160" height="16"/></g>
+    <rect x="620" y="110" width="60" height="105" fill="#d9d2c0"/><rect x="600" y="195" width="100" height="20" fill="#b8ae96"/>
+    <rect x="720" y="185" width="70" height="30" fill="#b8ae96"/>
+    <rect x="1040" y="90" width="70" height="125" fill="#6b4a17"/>
+  </g>
+  <g fill="#8a4a7a" stroke="#f3d68a"><rect x="205" y="110" width="80" height="55"/><rect x="385" y="110" width="80" height="55"/><rect x="880" y="110" width="80" height="55"/></g>
+  <g fill="#f2e9d2" font-size="13" text-anchor="middle">
+    <text x="60" y="240">ENTRADA</text><text x="245" y="100">Relieve: olivo</text><text x="425" y="100">Relieve: búho</text><text x="920" y="100">Relieve: escudo</text>
+    <text x="650" y="100">Estatua de Atenea</text><text x="755" y="177">Altar</text><text x="1075" y="80">Puerta final</text>
+  </g>
+</svg>
+<p class="nota">La estatua dice "Observa el santuario": los tres relieves se examinan en cualquier orden. No hay preguntas ni respuestas que fallar; el capítulo se supera observando.</p>
+
+<h2 id="reglas">4 · Reglas y lógica</h2>
+<div class="dos">
+  <div class="caja"><h3>Controles (PC)</h3>
+    <table>
+      <tr><td>← → / A D</td><td>Caminar</td></tr><tr><td>Shift</td><td>Correr</td></tr><tr><td>Espacio</td><td>Saltar (más alto si se mantiene)</td></tr>
+      <tr><td>J</td><td>Atacar con la daga</td></tr><tr><td>E</td><td>Hablar, examinar, continuar el diálogo</td></tr><tr><td>Tab</td><td>Abrir o cerrar el códice</td></tr><tr><td>Esc</td><td>Pausa</td></tr>
+    </table>
+    <p class="nota">Con mando: palanca, A saltar, X atacar, Y hablar, RB correr, Select códice, Start pausa.</p>
+  </div>
+  <div class="caja"><h3>Estados del juego</h3>
+    <p>En cada momento el juego está en uno solo: <b>Menú</b>, <b>Jugando</b>, <b>Diálogo</b>, <b>Códice</b>, <b>Pausa</b> o <b>Recompensa</b>.</p>
+    <p>Solo en <b>Jugando</b> se mueve Alexios. En los demás se queda quieto y el tiempo se detiene, para que no pueda pasar nada raro mientras lees.</p>
+  </div>
+  <div class="caja"><h3>Prólogo</h3>
+    <ul>
+      <li>La misión empieza al hablar con Thales. Antes, los habitantes solo saludan.</li>
+      <li>Cada habitante se cuenta una vez. Volver a hablarle repite su pista en corto.</li>
+      <li>Los pergaminos se pueden recoger en cualquier orden, también sin haber hablado antes con su habitante.</li>
+      <li>El santuario se abre con 3 pergaminos <b>y</b> los 3 habitantes escuchados. Si falta algo, la puerta dice qué falta.</li>
+      <li>Si Alexios cae fuera del nivel, vuelve al último punto de control sin perder nada.</li>
+    </ul>
+  </div>
+  <div class="caja"><h3>Capítulo 1</h3>
+    <ul>
+      <li>Al entrar, la estatua de Atenea brilla y habla. Atenea no aparece en persona.</li>
+      <li>Cada relieve se examina con <b>E</b>: muestra su imagen y añade una entrada al códice.</li>
+      <li>Los relieves se pueden ver en cualquier orden y repetir.</li>
+      <li>Con los tres vistos: sonido, luz dorada, la puerta se abre y la estatua entrega el medallón.</li>
+      <li>Si se va a la puerta antes de tiempo, dice cuántos relieves faltan.</li>
+    </ul>
+  </div>
+  <div class="caja"><h3>La daga</h3>
+    <ul>
+      <li>Golpea lo que hay justo delante durante los fotogramas del tajo.</li>
+      <li>Las ánforas se rompen de un golpe. Una de ellas esconde el pergamino 3; las demás están vacías.</li>
+      <li>No hay puntos ni monedas: el progreso se mide con el códice.</li>
+    </ul>
+  </div>
+  <div class="caja"><h3>Guardado</h3>
+    <ul>
+      <li>Se guarda solo al tocar un punto de control y al terminar cada nivel.</li>
+      <li>Se guardan: nivel, pergaminos, habitantes escuchados y entradas del códice.</li>
+      <li>"Continuar" en el menú retoma desde el último punto.</li>
+    </ul>
+  </div>
+</div>
+
+<h2 id="codice">5 · Códice: textos propuestos</h2>
+<p>Cada entrada separa el <b>dato histórico</b> del <b>mito</b>, como pide el guion. Son borradores: quien lleve la investigación del equipo debe revisarlos.</p>
+<table>
+  <tr><th>Entrada</th><th>Se desbloquea</th><th>Texto</th></tr>
+  <tr><td>Las ánforas</td><td>Alfarera</td><td><b>Histórico.</b> Vasijas de barro con dos asas. Servían para guardar y transportar aceite, vino y grano. Muchas se decoraban con escenas de mitos y de la vida diaria.</td></tr>
+  <tr><td>El Partenón</td><td>Escriba</td><td><b>Histórico.</b> Templo de la Acrópolis de Atenas dedicado a Atenea. Se construyó en el siglo V a. C., en tiempos de Pericles. <b>Mito.</b> Guardaba una gran estatua de la diosa hecha de oro y marfil.</td></tr>
+  <tr><td>Los pergaminos</td><td>Niño</td><td><b>Histórico.</b> En la Grecia clásica se escribía sobre todo en rollos de papiro traídos de Egipto y en tablillas de cera. El pergamino, hecho de piel, se extendió más tarde.</td></tr>
+  <tr><td>Atenea y sus símbolos</td><td>Relieves del templo</td><td><b>Mito.</b> Diosa de la sabiduría, la estrategia y los oficios; regaló el olivo a Atenas. <b>Histórico.</b> Su búho aparecía en las monedas de plata de la ciudad.</td></tr>
+</table>
+
+<h2 id="imagenes">6 · Imágenes que necesito de ti</h2>
+<div class="aviso">
+  <b>Tres condiciones para que salgan nítidas en el juego:</b>
+  <ol style="margin:6px 0">
+    <li>Archivo <b>PNG</b> original. Si lo mandas por WhatsApp, envíalo como <b>documento</b>, no como foto: la foto lo comprime y es lo que emborronó las hojas de Alexios.</li>
+    <li>Personajes y objetos sobre un <b>fondo liso azul marino</b>, como tus hojas, sin textos ni números encima de los dibujos y con hueco entre fotogramas.</li>
+    <li>Mismo estilo, misma paleta y mismo tamaño de personaje que tus hojas de Alexios.</li>
+  </ol>
+</div>
+<table>
+  <tr><th>Nº</th><th>Imagen</th><th>Detalle</th></tr>
+  <tr><td>1</td><td>Alexios en reposo</td><td>4 fotogramas respirando, de perfil, con la daga a la espalda. Ahora el reposo es un dibujo quieto.</td></tr>
+  <tr><td>2</td><td>Fondo del Prólogo en 3 capas</td><td>Tres imágenes anchas (proporción 3:1) que se repitan por los lados: cielo de amanecer con nubes · colinas lejanas con la Acrópolis · ciudad a media distancia. Sin suelo ni personajes.</td></tr>
+  <tr><td>3</td><td>Piezas del Prólogo</td><td>Sueltas sobre fondo liso: tramo de suelo de piedra que se repita · muro con greca · casa blanca con tejado rojo · pórtico de dos columnas con dintel · escalinata · balaustrada · estandarte · ciprés · arbusto.</td></tr>
+  <tr><td>4</td><td>Santuario por fuera</td><td>Fachada con puerta cerrada y la misma con la puerta abierta e iluminada.</td></tr>
+  <tr><td>5</td><td>Ánfora</td><td>Entera y 3 fotogramas rompiéndose.</td></tr>
+  <tr><td>6</td><td>Pergamino</td><td>Pergamino enrollado con 4 fotogramas de brillo.</td></tr>
+  <tr><td>7</td><td>Thales</td><td>Anciano maestro. Hoja con reposo (4) y hablando (4), de perfil mirando a la izquierda. Más un retrato grande de busto.</td></tr>
+  <tr><td>8</td><td>Tres habitantes</td><td>Alfarera, escriba y niño. Cada uno: reposo (4 fotogramas) y retrato de busto.</td></tr>
+  <tr><td>9</td><td>Estatua de Atenea</td><td>Estatua de mármol con casco, lanza y escudo, en dos versiones: apagada y brillando. Más un retrato de busto de la estatua para los diálogos.</td></tr>
+  <tr><td>10</td><td>Interior del templo</td><td>Fondo ancho (2:1) con columnas y antorchas · altar · puerta cerrada y abierta · tres relieves de pared pequeños: olivo, búho y escudo.</td></tr>
+  <tr><td>11</td><td>Relieves en grande y premio</td><td>Los tres relieves (olivo, búho y escudo) en ilustración grande, para cuando se examinan · medallón de sabiduría.</td></tr>
+  <tr><td>12</td><td>Interfaz</td><td>Marco como el de "Pergaminos" pero vacío · caja de diálogo · botón normal y seleccionado · libro abierto del códice · logotipo del título · imagen de fondo del menú.</td></tr>
+  <tr><td>13</td><td>Retrato de Alexios</td><td>Busto, para sus frases en los diálogos.</td></tr>
+</table>
+<p class="nota">No hace falta mandarlo todo junto. Con los números 2, 3, 7 y 12 ya puedo montar el Prólogo con su interfaz. Mientras tanto uso huecos rayados como los de arriba.</p>
+
+<h2 id="sonido">7 · Sonido y música</h2>
+<table>
+  <tr><th>Tipo</th><th>Qué</th></tr>
+  <tr><td>Música</td><td>Menú · Atenas al amanecer (lira y flauta, tranquila) · Templo (más solemne) · fanfarria corta de recompensa.</td></tr>
+  <tr><td>Alexios</td><td>Pasos sobre piedra · salto · aterrizaje · tajo de la daga.</td></tr>
+  <tr><td>Mundo</td><td>Ánfora rota · pergamino · puerta de piedra que se abre · ambiente de calle con pájaros.</td></tr>
+  <tr><td>Interfaz</td><td>Mover selección · aceptar · letra del diálogo · entrada nueva del códice · abrir el códice.</td></tr>
+</table>
+<p class="nota">Los efectos los genero yo. La música se hará con una herramienta de IA <b>como prueba</b>; si no te gusta, la pones tú.</p>
+
+<h2 id="orden">8 · Orden de trabajo</h2>
+<p>Cada fase termina con una versión que puedes jugar y aprobar antes de empezar la siguiente.</p>
+<ol class="fases">
+  <li><b>Base del juego.</b> Estados (menú, jugando, diálogo, pausa), guardado, controles con teclado y mando, cámara suave. Sin arte nuevo.</li>
+  <li><b>Interfaz.</b> Menú principal, pausa, marcadores, objetivo, avisos de tecla, caja de diálogo con texto letra a letra.</li>
+  <li><b>Prólogo jugable.</b> Thales y los tres habitantes, pergaminos, ánforas, puntos de control, puerta del santuario.</li>
+  <li><b>Escenario del Prólogo.</b> Tus capas de fondo con paralaje y tus piezas montadas en el nivel largo.</li>
+  <li><b>Códice.</b> Libro, entradas y desbloqueo.</li>
+  <li><b>Capítulo 1.</b> Templo, estatua de Atenea, relieves, recompensa y pantalla final.</li>
+  <li><b>Sonido.</b> Efectos, música y opciones de volumen.</li>
+  <li><b>Pulido.</b> Transiciones, partículas (polvo al aterrizar, destellos), ajustes de salto y prueba completa.</li>
+</ol>
+
+<h2 id="dudas">9 · Tus respuestas (2026-11-16)</h2>
+<ol>
+  <li><b>Nombre:</b> el juego pasa a llamarse "Los Herederos del Olimpo".</li>
+  <li><b>Habitantes:</b> alfarera, escriba y niño, por ahora.</li>
+  <li><b>Sin puntos:</b> no hay dracmas ni puntuación.</li>
+  <li><b>Sonido:</b> efectos, y música hecha con IA como prueba.</li>
+  <li><b>Idioma:</b> español por ahora.</li>
+  <li><b>Atenea:</b> al principio es su estatua la que habla y brilla.</li>
+  <li><b>Thales:</b> se queda en la plaza.</li>
+  <li><b>Códice:</b> mis textos son solo borradores para ver cómo queda; no son la versión final.</li>
+  <li><b>Pantallas:</b> aprobadas.</li>
+  <li><b>Sin acertijos:</b> el Capítulo 1 se supera examinando los tres relieves.</li>
+</ol>
+</main>
+<script>
+// Pestañas para cambiar de pantalla de ejemplo
+const pantallas = [...document.querySelectorAll('.pantalla')], barra = document.getElementById('pestanas');
+pantallas.forEach((p, i) => {
+  const b = document.createElement('button'); b.textContent = p.dataset.nombre; if (!i) b.className = 'activa';
+  b.onclick = () => { pantallas.forEach(q => q.classList.toggle('visible', q === p)); [...barra.children].forEach(c => c.classList.toggle('activa', c === b)); };
+  barra.append(b);
+});
+// ?pantalla=N abre una pantalla concreta (para capturas)
+const n = new URLSearchParams(location.search).get('pantalla'); if (n) barra.children[+n]?.click();
+</script>
+</body>
+</html>

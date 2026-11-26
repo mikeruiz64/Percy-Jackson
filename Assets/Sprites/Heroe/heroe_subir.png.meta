@@ -121,8 +121,8 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 45
-        height: 70
+        width: 104
+        height: 99
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -131,7 +131,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 81c83f15fb3121840bb4bc59f22f9075
+      spriteID: b28c1464f15c1d64a82baf08f53a62fa
       internalID: 325140479
       vertices: []
       indices: 
@@ -141,10 +141,10 @@ TextureImporter:
       name: heroe_subir_01
       rect:
         serializedVersion: 2
-        x: 45
+        x: 104
         y: 0
-        width: 45
-        height: 70
+        width: 104
+        height: 99
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -153,7 +153,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1b830eafbcae26749b25b54b6beb4522
+      spriteID: 25133092c8aac2348b6aced1ba1b83e5
       internalID: -793816504
       vertices: []
       indices: 

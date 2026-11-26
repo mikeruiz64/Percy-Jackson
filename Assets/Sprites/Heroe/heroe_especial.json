@@ -1,0 +1,73 @@
+{
+ "frames": [
+  {
+   "filename": "especial 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 90
+  },
+  {
+   "filename": "especial 1",
+   "frame": {
+    "x": 104,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 90
+  },
+  {
+   "filename": "especial 2",
+   "frame": {
+    "x": 208,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 90
+  },
+  {
+   "filename": "especial 3",
+   "frame": {
+    "x": 312,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 90
+  },
+  {
+   "filename": "especial 4",
+   "frame": {
+    "x": 416,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 90
+  },
+  {
+   "filename": "especial 5",
+   "frame": {
+    "x": 520,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 90
+  }
+ ],
+ "meta": {
+  "image": "heroe_especial.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 624,
+   "h": 99
+  },
+  "scale": "1"
+ }
+}

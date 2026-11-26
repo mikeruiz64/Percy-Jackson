@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuevo estilo · vista previa</title>
+<style>
+  :root { --fondo:#0f1626; --panel:#18223a; --oro:#d9a84a; --texto:#eee6d2; }
+  body { margin:0; background:var(--fondo); color:var(--texto); font-family:Georgia, serif; }
+  header, main { max-width:1280px; margin:0 auto; padding:16px; }
+  h1 { color:var(--oro); font-weight:normal; margin:8px 0; }
+  h2 { color:var(--oro); font-weight:normal; font-size:20px; }
+  #juego { width:100%; aspect-ratio:16/9; image-rendering:pixelated; border:2px solid var(--oro); border-radius:6px; display:block; }
+  .ayuda { opacity:.85; font-size:15px; }
+  kbd { border:1px solid var(--oro); border-radius:4px; padding:0 5px; font-family:monospace; }
+  .barra { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+  button { background:var(--panel); color:var(--texto); border:1px solid var(--oro); border-radius:5px; padding:6px 12px; font:inherit; cursor:pointer; }
+  button.activo { background:var(--oro); color:#1a1205; }
+  #tarjetas { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; }
+  .tarjeta { background:var(--panel); border:1px solid #3a4666; border-radius:6px; padding:8px; text-align:center; }
+  .tarjeta canvas { width:100%; aspect-ratio:1; image-rendering:pixelated; background:repeating-conic-gradient(#222b44 0 25%, #1b2338 0 50%) 0 0/16px 16px; }
+  .tarjeta small { opacity:.7; }
+  #tiras canvas { display:block; max-width:100%; margin:0 0 10px; background:#2a3352; image-rendering:pixelated; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Así quedaría el juego con el nuevo estilo</h1>
+  <p class="ayuda">Prueba: <kbd>←</kbd><kbd>→</kbd> caminar · <kbd>Shift</kbd> correr · <kbd>Espacio</kbd> saltar (sube al tejado a por los pergaminos) · <kbd>J</kbd> ataque · <kbd>K</kbd> ataque especial · <kbd>H</kbd> recibir daño · <kbd>L</kbd> derrota · <kbd>R</kbd> reiniciar</p>
+  <div class="barra" id="armas">
+    <button data-arma="tridente" class="activo">Con tridente</button>
+    <button data-arma="espada">Con espada</button>
+  </div>
+</header>
+<main>
+  <canvas id="juego" width="1600" height="900"></canvas>
+  <h2>Animaciones recortadas de tus hojas</h2>
+  <div id="tarjetas"></div>
+  <h2>Todos los fotogramas</h2>
+  <div id="tiras"></div>
+</main>
+<script>
+</script>
+<script src="recorte.js"></script>
+<script>
+let anims = {}, arma = 'tridente', mapa, mapaLimpio;
+
+async function prepararArma(nombre) {
+  const img = await cargar(HOJAS[nombre]);
+  const esc = img.naturalWidth / 1600;
+  const res = {};
+  for (const [k, z] of Object.entries(ZONAS)) res[k] = { ms:z.ms, f: recortar(img, z.r.map(v => Math.round(v * esc)), z.n) };
+  return res;
+}
+
+// --- Tarjetas de revisión ---
+function pintarTarjetas() {
+  const cont = document.getElementById('tarjetas'); cont.innerHTML = '';
+  for (const [k, a] of Object.entries(anims)) {
+    const d = document.createElement('div'); d.className = 'tarjeta';
+    const cv = document.createElement('canvas'); cv.width = cv.height = 160;
+    d.append(cv, Object.assign(document.createElement('div'), { textContent: NOMBRES[k] }),
+      Object.assign(document.createElement('small'), { textContent: `${a.f.length} fotogramas · ${a.ms} ms` }));
+    cont.append(d); a.tarjeta = cv;
+  }
+  // Tira con todos los fotogramas, para revisar el recorte.
+  const tiras = document.getElementById('tiras'); tiras.innerHTML = '';
+  for (const [k, a] of Object.entries(anims)) {
+    const W = a.f.reduce((s, f) => s + f.lienzo.width + 8, 0), H = Math.max(...a.f.map(f => f.lienzo.height));
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H; cv.title = NOMBRES[k];
+    const g = cv.getContext('2d'); let x = 0;
+    for (const f of a.f) { g.drawImage(f.lienzo, x, H - f.lienzo.height); x += f.lienzo.width + 8; }
+    tiras.append(cv);
+  }
+}
+function animarTarjetas(t) {
+  for (const a of Object.values(anims)) {
+    if (!a.tarjeta || !a.f.length) continue;
+    const g = a.tarjeta.getContext('2d'); g.clearRect(0, 0, 160, 160); g.imageSmoothingEnabled = false;
+    const f = a.f[Math.floor(t / a.ms) % a.f.length];
+    const s = Math.min(1.2, 150 / Math.max(f.lienzo.width, f.lienzo.height));
+    g.drawImage(f.lienzo, 80 - f.ax * s, 152 - f.lienzo.height * s, f.lienzo.width * s, f.lienzo.height * s);
+  }
+}
+
+// --- Juego de prueba sobre la escena ---
+const SUELO = 765, TEJADO = { x0:830, x1:1290, y:505 }, ESCALA = 2.3;
+let heroe, pergaminos, teclas = {};
+function reiniciar() {
+  heroe = { x:330, y:SUELO, vx:0, vy:0, enSuelo:true, mira:1, accion:null, tAccion:0, tAterriza:-1, t:0 };
+  pergaminos = { cogidos:false };
+}
+addEventListener('keydown', e => {
+  if (['ArrowLeft','ArrowRight','Space','ArrowUp'].includes(e.code)) e.preventDefault();
+  if (e.repeat) return; teclas[e.code] = true;
+  if (e.code === 'KeyR') reiniciar();
+  if (heroe.accion === 'derrota') return;
+  if ((e.code === 'Space' || e.code === 'ArrowUp') && heroe.enSuelo && !heroe.accion) { heroe.vy = -1250; heroe.enSuelo = false; heroe.tSalto = 0; }
+  const acc = { KeyJ:'ataque', KeyK:'especial', KeyH:'danio', KeyL:'derrota' }[e.code];
+  if (acc && !heroe.accion) { heroe.accion = acc; heroe.tAccion = 0; }
+});
+addEventListener('keyup', e => { teclas[e.code] = false; if ((e.code === 'Space' || e.code === 'ArrowUp') && heroe.vy < -500) heroe.vy = -500; });
+
+function actualizar(dt) {
+  const h = heroe; h.t += dt * 1000;
+  const dir = (teclas.ArrowRight || teclas.KeyD ? 1 : 0) - (teclas.ArrowLeft || teclas.KeyA ? 1 : 0);
+  const corre = teclas.ShiftLeft || teclas.ShiftRight;
+  h.vx = h.accion ? 0 : dir * (corre ? 560 : 300);
+  if (dir) h.mira = dir;
+  h.vy += 3200 * dt;
+  const yAntes = h.y;
+  h.x = Math.max(160, Math.min(1560, h.x + h.vx * dt)); h.y += h.vy * dt;
+  const sobreTejado = h.x > TEJADO.x0 && h.x < TEJADO.x1;
+  const antes = h.enSuelo; h.enSuelo = false;
+  if (h.vy >= 0 && sobreTejado && yAntes <= TEJADO.y && h.y >= TEJADO.y) { h.y = TEJADO.y; h.vy = 0; h.enSuelo = true; }
+  if (h.y >= SUELO) { h.y = SUELO; h.vy = 0; h.enSuelo = true; }
+  if (h.enSuelo && !antes) h.tAterriza = 0;
+  if (h.tAterriza >= 0) { h.tAterriza += dt * 1000; if (h.tAterriza > 180) h.tAterriza = -1; }
+  if (!h.enSuelo) h.tSalto = (h.tSalto || 0) + dt * 1000;
+  if (h.accion && h.accion !== 'derrota') { h.tAccion += dt * 1000; const a = anims[h.accion]; if (h.tAccion >= a.f.length * a.ms) h.accion = null; }
+  else if (h.accion) h.tAccion += dt * 1000;
+  if (!pergaminos.cogidos && Math.abs(h.x - 1095) < 70 && Math.abs(h.y - TEJADO.y) < 10) pergaminos.cogidos = true;
+}
+
+function fotograma() {
+  const h = heroe, A = n => anims[n];
+  if (h.accion) { const a = A(h.accion); return a.f[Math.min(a.f.length - 1, Math.floor(h.tAccion / a.ms))]; }
+  const s = A('saltar').f;
+  if (!h.enSuelo) {
+    if (h.tSalto < 70) return s[1];
+    return h.vy < -350 ? s[2] : h.vy < 350 ? s[3] : s[4];
+  }
+  if (h.tAterriza >= 0) return s[h.tAterriza < 90 ? 5 : 6];
+  if (h.vx) { const a = A(Math.abs(h.vx) > 400 ? 'correr' : 'caminar'); return a.f[Math.floor(h.t / a.ms) % a.f.length]; }
+  return A('interactuar').f[0] || A('caminar').f[0];
+}
+
+function dibujar() {
+  const cv = document.getElementById('juego'), g = cv.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  g.drawImage(mapaLimpio, 0, 0);
+  if (pergaminos.cogidos) {
+    g.drawImage(mapa, 1150, 430, 100, 72, 1045, 430, 100, 72); // tapa los pergaminos con el cielo de al lado
+    g.fillStyle = '#1d2a4d'; g.fillRect(318, 26, 60, 46);
+    g.fillStyle = '#fff3d6'; g.font = 'bold 34px Georgia'; g.fillText('2', 324, 62);
+  }
+  const f = fotograma(), h = heroe; if (!f) return;
+  g.save(); g.translate(Math.round(h.x), Math.round(h.y)); g.scale(h.mira * ESCALA, ESCALA);
+  g.drawImage(f.lienzo, -f.ax, -f.lienzo.height + 4);
+  g.restore();
+}
+
+// El héroe que ya viene pintado en la escena se tapa con la barandilla y el fondo de su derecha.
+function limpiarMapa() {
+  const c = document.createElement('canvas'); c.width = 1600; c.height = 900;
+  const g = c.getContext('2d'); g.drawImage(mapa, 0, 0, 1600, 900);
+  g.drawImage(mapa, 330, 530, 200, 236, 140, 530, 200, 236);
+  return c;
+}
+
+let ultimo = 0;
+function bucle(t) {
+  const dt = Math.min(0.033, (t - ultimo) / 1000 || 0); ultimo = t;
+  if (heroe) { actualizar(dt); dibujar(); }
+  animarTarjetas(t);
+  requestAnimationFrame(bucle);
+}
+
+async function elegirArma(nombre) {
+  arma = nombre; anims = await prepararArma(nombre); pintarTarjetas();
+  document.querySelectorAll('#armas button').forEach(b => b.classList.toggle('activo', b.dataset.arma === nombre));
+}
+document.querySelectorAll('#armas button').forEach(b => b.onclick = () => elegirArma(b.dataset.arma));
+
+(async () => {
+  mapa = await cargar(MAPA); mapaLimpio = limpiarMapa();
+  await elegirArma('tridente'); reiniciar();
+  window.LISTO = Object.fromEntries(Object.entries(anims).map(([k, a]) => [k, a.f.length]));
+  document.title = 'Nuevo estilo · ' + JSON.stringify(window.LISTO);
+  requestAnimationFrame(bucle);
+})();
+</script>
+</body>
+</html>

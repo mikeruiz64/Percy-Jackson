@@ -1,0 +1,53 @@
+{
+ "frames": [
+  {
+   "filename": "defender 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 110
+  },
+  {
+   "filename": "defender 1",
+   "frame": {
+    "x": 104,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 110
+  },
+  {
+   "filename": "defender 2",
+   "frame": {
+    "x": 208,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 110
+  },
+  {
+   "filename": "defender 3",
+   "frame": {
+    "x": 312,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 110
+  }
+ ],
+ "meta": {
+  "image": "heroe_defender.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 416,
+   "h": 99
+  },
+  "scale": "1"
+ }
+}

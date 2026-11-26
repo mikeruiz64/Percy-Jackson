@@ -1,0 +1,23 @@
+{
+ "frames": [
+  {
+   "filename": "reposo 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 500
+  }
+ ],
+ "meta": {
+  "image": "heroe_tridente_reposo.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 134,
+   "h": 79
+  },
+  "scale": "1"
+ }
+}

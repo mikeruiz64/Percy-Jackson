@@ -127,8 +127,8 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 45
-        height: 70
+        width: 104
+        height: 99
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -137,74 +137,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5ba34aa2430490a489d1f728cb0f2684
+      spriteID: dbf4bd381e1b2d345a93b2beafa9720f
       internalID: -1537046149
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: heroe_reposo_01
-      rect:
-        serializedVersion: 2
-        x: 45
-        y: 0
-        width: 45
-        height: 70
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: fb32435d28c02a843a624969b6f015cd
-      internalID: 1752826071
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: heroe_reposo_02
-      rect:
-        serializedVersion: 2
-        x: 90
-        y: 0
-        width: 45
-        height: 70
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 00ca0590e86882d4880fb5031f37b850
-      internalID: -1430776807
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: heroe_reposo_03
-      rect:
-        serializedVersion: 2
-        x: 135
-        y: 0
-        width: 45
-        height: 70
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6d3b391925e198946a5cf9cecfe1e800
-      internalID: -1815697017
       vertices: []
       indices: 
       edges: []
@@ -224,9 +158,6 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       heroe_reposo_00: -1537046149
-      heroe_reposo_01: 1752826071
-      heroe_reposo_02: -1430776807
-      heroe_reposo_03: -1815697017
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

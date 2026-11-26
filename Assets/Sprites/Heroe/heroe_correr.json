@@ -1,0 +1,93 @@
+{
+ "frames": [
+  {
+   "filename": "correr 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 1",
+   "frame": {
+    "x": 104,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 2",
+   "frame": {
+    "x": 208,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 3",
+   "frame": {
+    "x": 312,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 4",
+   "frame": {
+    "x": 416,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 5",
+   "frame": {
+    "x": 520,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 6",
+   "frame": {
+    "x": 624,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 60
+  },
+  {
+   "filename": "correr 7",
+   "frame": {
+    "x": 728,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 60
+  }
+ ],
+ "meta": {
+  "image": "heroe_correr.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 832,
+   "h": 99
+  },
+  "scale": "1"
+ }
+}

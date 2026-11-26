@@ -1,0 +1,53 @@
+{
+ "frames": [
+  {
+   "filename": "interactuar 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 150
+  },
+  {
+   "filename": "interactuar 1",
+   "frame": {
+    "x": 104,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 150
+  },
+  {
+   "filename": "interactuar 2",
+   "frame": {
+    "x": 208,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 150
+  },
+  {
+   "filename": "interactuar 3",
+   "frame": {
+    "x": 312,
+    "y": 0,
+    "w": 104,
+    "h": 99
+   },
+   "duration": 150
+  }
+ ],
+ "meta": {
+  "image": "heroe_interactuar.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 416,
+   "h": 99
+  },
+  "scale": "1"
+ }
+}

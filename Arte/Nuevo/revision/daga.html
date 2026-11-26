@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daga y limpieza · propuestas</title>
+<style>
+  :root { --fondo:#0f1626; --panel:#18223a; --oro:#d9a84a; --texto:#eee6d2; }
+  body { margin:0; background:var(--fondo); color:var(--texto); font-family:Georgia, serif; }
+  main { max-width:1280px; margin:0 auto; padding:16px; }
+  h1 { color:var(--oro); font-weight:normal; }
+  h2 { color:var(--oro); font-weight:normal; font-size:20px; margin-top:28px; }
+  p { opacity:.9; }
+  table { border-collapse:collapse; width:100%; }
+  th { color:var(--oro); font-weight:normal; padding:6px; }
+  th small { display:block; color:var(--texto); opacity:.7; font-size:13px; }
+  td { padding:6px; text-align:center; }
+  td.nombre { text-align:left; white-space:nowrap; }
+  canvas { image-rendering:pixelated; background:#cfc6b0; border-radius:4px; max-width:100%; }
+  .claro canvas { background:#cfc6b0; } .oscuro canvas { background:#1b2338; }
+  .barra { display:flex; gap:8px; margin:8px 0; }
+  button { background:var(--panel); color:var(--texto); border:1px solid var(--oro); border-radius:5px; padding:6px 12px; font:inherit; cursor:pointer; }
+  button.activo { background:var(--oro); color:#1a1205; }
+  .tira { display:block; margin:6px 0 14px; }
+</style>
+</head>
+<body class="claro">
+<main>
+  <h1>Alexios con daga: corrección del dibujo</h1>
+  <p>A la izquierda tu hoja original; en el centro el sprite que está ahora en el juego; a la derecha el corregido: sin agujeros en el cuerpo y con el borde limpio. Debajo, todos los fotogramas de cada animación.</p>
+  <div class="barra">
+    <button data-fondo="claro" class="activo">Fondo claro</button>
+    <button data-fondo="oscuro">Fondo oscuro</button>
+  </div>
+  <table id="tabla"></table>
+  <h2>Todos los fotogramas: arriba como está ahora, abajo corregido</h2>
+  <div id="tiras"></div>
+</main>
+<script src="recorte.js"></script>
+<script>
+const hex = h => [1,3,5].map(i => parseInt(h.slice(i, i+2), 16));
+const CONTORNO = hex('#1c1a2b');
+// Paleta del estilo aprobado; sin negro puro (el pelo va en azul muy oscuro).
+const PALETA = ['#262a40','#363b58','#4d5578','#7a84b0',  // pelo
+  '#f4c48f','#e09a62','#b36a3e',                          // piel
+  '#1f2d5c','#2f4486','#4562b0','#3f6fd0','#6f9cf0',      // túnica y capa
+  '#8a5a1c','#d49a2c','#f7d36a',                          // oro
+  '#5a3420','#7a4826','#a8683a',                          // botas y cuero
+  '#2f9e4f','#7ee08a',                                    // ojos
+  '#f4f1e6','#b9c3d0','#7f8a9a',                          // blanco y acero
+  '#d8402a','#ff8a3a','#5fd0ff','#bfefff'].map(hex);      // efectos
+const NEGRO = hex('#121018');
+
+const VARIANTES = [
+  { id:'O', nombre:'Original', nota:'tu hoja', original:true, cerrar:3 },
+  { id:'B', nombre:'Ahora en el juego', nota:'limpieza B', escala:0.72, cerrar:0 },
+  { id:'D', nombre:'Corregido', nota:'sin agujeros, borde limpio', escala:0.72, cerrar:3, pulir:true },
+];
+const FINAL = 'B';   // variante que se exporta al juego
+const MUESTRA = Object.keys(ZONAS);
+
+function cerca(r, g, b, pal) {
+  let mejor = pal[0], d0 = 1e9;
+  for (const c of pal) { const d = 2*(r-c[0])**2 + 4*(g-c[1])**2 + 3*(b-c[2])**2; if (d < d0) { d0 = d; mejor = c; } }
+  return mejor;
+}
+// Aclara las sombras casi negras conservando su tono, para que no salgan manchas negras.
+function aclarar(r, g, b) {
+  const mx = Math.max(r, g, b);
+  if (mx >= 95) return [r, g, b];
+  const neutro = mx - Math.min(r, g, b) < 14; // negro sin tono (pelo): se lleva al azul oscuro del pelo
+  if (neutro) return [38 + r*0.3, 42 + g*0.3, 64 + b*0.3];
+  const k = (95 - mx) * 0.55 / Math.max(mx, 1) + 1;
+  return [r*k, g*k, b*k];
+}
+
+// Espada -> daga: deja solo los primeros píxeles de la hoja (los más cercanos al cuerpo).
+function aDaga(lienzo) {
+  const w = lienzo.width, h = lienzo.height, g = lienzo.getContext('2d', { willReadFrequently:true });
+  const d = g.getImageData(0, 0, w, h), p = d.data;
+  // Hoja = píxeles claros y grises por debajo de la cara (los ojos y brillos del pelo quedan arriba).
+  const esHoja = k => { const i = k*4, mn = Math.min(p[i],p[i+1],p[i+2]), mx = Math.max(p[i],p[i+1],p[i+2]); return p[i+3] && mn > 115 && mx - mn < 70 && (k / w | 0) > h * 0.4; };
+  // La hoja es la pieza gris continua más ancha (8 vecinos); si no mide 25 px, la espada está envainada.
+  const visto = new Uint8Array(w*h); let hoja = [];
+  for (let k = 0; k < w*h; k++) {
+    if (visto[k] || !esHoja(k)) continue;
+    const comp = [], q = [k]; visto[k] = 1;
+    while (q.length) { const j = q.pop(); comp.push(j); const x = j % w;
+      for (const dy of [-w, 0, w]) for (const dx of [-1, 0, 1]) { if ((x === 0 && dx < 0) || (x === w-1 && dx > 0)) continue;
+        const v = j + dy + dx; if (v >= 0 && v < w*h && !visto[v] && esHoja(v)) { visto[v] = 1; q.push(v); } } }
+    const ancho = c => { const xs = c.map(j => j % w); return Math.max(...xs) - Math.min(...xs); };
+    if (comp.length >= 30 && ancho(comp) > (hoja.length ? ancho(hoja) : 0)) hoja = comp;
+  }
+  if (!hoja.length) return lienzo;
+  const xs = hoja.map(k => k % w), x0 = Math.min(...xs);
+  if (Math.max(...xs) - x0 < 25) return lienzo;
+  // Mira a la derecha: la empuñadura es el extremo izquierdo; se queda una hoja de 14 px.
+  const quitar = hoja.filter((k, i) => xs[i] > x0 + 14);
+  // Se borra lo quitado y su contorno: lo oscuro o gris a 2 px como mucho de esa parte.
+  const zona = new Uint8Array(w*h);
+  for (const k of quitar) { const x = k % w, y = k / w | 0;
+    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) { const xx = x+dx, yy = y+dy; if (xx >= 0 && xx < w && yy >= 0 && yy < h && xx > x0 + 14) zona[yy*w + xx] = 1; } }
+  for (let k = 0; k < w*h; k++) { if (!zona[k]) continue;
+    const i = k*4, mn = Math.min(p[i],p[i+1],p[i+2]), mx = Math.max(p[i],p[i+1],p[i+2]);
+    if (mx < 90 || (mn > 90 && mx - mn < 70)) p[i+3] = 0; }
+  // Punta: triángulo de acero que sigue la inclinación de la hoja, con contorno oscuro.
+  const media = (a, b) => { const ys = hoja.filter((k, i) => xs[i] >= a && xs[i] <= b).map(k => k / w | 0); return ys.length ? [ys.reduce((s, y) => s + y, 0) / ys.length, Math.min(...ys), Math.max(...ys)] : null; };
+  const ini = media(x0, x0 + 3), fin = media(x0 + 12, x0 + 14);
+  if (ini && fin) {
+    const pend = (fin[0] - ini[0]) / 12, medio = Math.max(1, (fin[2] - fin[1]) / 2), largo = Math.round(medio) + 3;
+    const pon = (x, y, c) => { if (x < 0 || x >= w || y < 0 || y >= h) return; const i = (y*w + x)*4; p[i] = c[0]; p[i+1] = c[1]; p[i+2] = c[2]; p[i+3] = 255; };
+    for (let d = 1; d <= largo; d++) {
+      const x = x0 + 14 + d, yc = fin[0] + pend * d, a = medio * (1 - d / (largo + 1));
+      for (let y = Math.round(yc - a); y <= Math.round(yc + a); y++) pon(x, y, [216, 222, 232]);
+      pon(x, Math.round(yc - a) - 1, CONTORNO); pon(x, Math.round(yc + a) + 1, CONTORNO);
+    }
+    pon(x0 + 15 + largo, Math.round(fin[0] + pend * (largo + 1)), CONTORNO);
+  }
+  g.putImageData(d, 0, 0);
+  return lienzo;
+}
+
+function limpiar(f, v) {
+  if (v.original) return f.lienzo;
+  const w = Math.max(1, Math.round(f.lienzo.width * v.escala)), h = Math.max(1, Math.round(f.lienzo.height * v.escala));
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d', { willReadFrequently:true });
+  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+  g.drawImage(f.lienzo, 0, 0, w, h);
+  const d = g.getImageData(0, 0, w, h), p = d.data;
+  for (let k = 0; k < w*h; k++) p[k*4+3] = p[k*4+3] > 120 ? 255 : 0;
+  if (v.pulir) for (let paso = 0; paso < 2; paso++) {
+    // Borde limpio: fuera los píxeles que sobresalen solos y dentro las muescas de un píxel.
+    const op = k => k >= 0 && k < w*h && p[k*4+3] ? 1 : 0, cambios = [];
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const k = y*w + x, vec = [x > 0 ? k-1 : -1, x < w-1 ? k+1 : -1, k-w, k+w], n = vec.reduce((s, q) => s + op(q), 0);
+      if (p[k*4+3] && n <= 1) cambios.push([k, -1]);
+      else if (!p[k*4+3] && n >= 3) cambios.push([k, vec.find(op)]);
+    }
+    for (const [k, de] of cambios) {
+      if (de < 0) p[k*4+3] = 0;
+      else p.copyWithin(k*4, de*4, de*4 + 4);
+    }
+  }
+  const borde = k => { const x = k % w; return [x>0?k-1:-1, x<w-1?k+1:-1, k-w, k+w].some(v => v < 0 || v >= w*h || !p[v*4+3]); };
+  const pal = v.negro ? [...PALETA, NEGRO] : PALETA;
+  const sal = new Uint8ClampedArray(p);
+  for (let k = 0; k < w*h; k++) {
+    const i = k*4; if (!p[i+3]) continue;
+    // Contorno fino de 1 px en azul muy oscuro; dentro, cada color al más cercano de la paleta.
+    const col = borde(k) ? CONTORNO : v.negro ? cerca(p[i], p[i+1], p[i+2], pal) : cerca(...aclarar(p[i], p[i+1], p[i+2]), pal);
+    sal[i] = col[0]; sal[i+1] = col[1]; sal[i+2] = col[2];
+  }
+  // Quita píxeles sueltos: si ningún vecino comparte su color y 3 vecinos coinciden entre sí, toma ese color.
+  const fin = new Uint8ClampedArray(sal), igual = (a, b) => sal[a]===sal[b] && sal[a+1]===sal[b+1] && sal[a+2]===sal[b+2];
+  for (let y = 1; y < h-1; y++) for (let x = 1; x < w-1; x++) {
+    const i = (y*w + x)*4; if (!sal[i+3]) continue;
+    const vec = [i-4, i+4, i-w*4, i+w*4].filter(j => sal[j+3]);
+    if (vec.length < 4 || vec.some(j => igual(i, j))) continue;
+    const j = vec.find(a => vec.filter(b => igual(a, b)).length >= 3);
+    if (j !== undefined) fin.set(sal.subarray(j, j+3), i);
+  }
+  sal.set(fin);
+  d.data.set(sal); g.putImageData(d, 0, 0);
+  return c;
+}
+
+// ---- Exportación para Unity (?exportar): versión B de las dos hojas, una hoja PNG + JSON de Aseprite por animación ----
+// [nombre en el juego, animación de la hoja, fotogramas (null = todos), duración de cada uno en ms]
+const JUEGO = [
+  ['reposo', 'caminar', [0], [500]],
+  ['caminar', 'caminar', null, 80], ['correr', 'correr', null, 60],
+  ['subir', 'saltar', [1, 2], 90], ['cima', 'saltar', [3], 120], ['caer', 'saltar', [4], 120], ['aterrizar', 'saltar', [5, 6], [80, 90]],
+  ['ataque', 'ataque', null, 70], ['especial', 'especial', null, 90], ['defender', 'defender', null, 110],
+  ['danio', 'danio', null, 110], ['interactuar', 'interactuar', null, 150], ['recoger', 'recoger', null, 130],
+  ['leer', 'leer', null, 180], ['derrota', 'derrota', null, 180],
+];
+async function exportar() {
+  const B = VARIANTES.find(v => v.id === FINAL), salida = {};
+  for (const [arma, hoja, prefijo] of [['daga', 'espada', 'heroe_'], ['tridente', 'tridente', 'heroe_tridente_']]) {
+    const img = await cargar(HOJAS[hoja]), esc = img.naturalWidth / 1600, limpios = {};
+    for (const k of new Set(JUEGO.map(j => j[1]))) {
+      const z = ZONAS[k], marcos = recortar(img, z.r.map(x => Math.round(x * esc)), z.n, B.cerrar);
+      if (arma === 'daga') marcos.forEach(f => aDaga(f.lienzo));
+      limpios[k] = marcos.map(f => ({ c: limpiar(f, B), ax: Math.round(f.ax * B.escala) }));
+    }
+    // Celda común a todas las animaciones: la cabeza en el centro y los pies abajo (pivote de Unity).
+    const todos = Object.values(limpios).flat();
+    const mitad = Math.max(...todos.map(f => Math.max(f.ax, f.c.width - f.ax))) + 1;
+    const W = mitad * 2, H = Math.max(...todos.map(f => f.c.height)) + 1;
+    for (const [nombre, k, idx, ms] of JUEGO) {
+      const fr = (idx || limpios[k].map((_, i) => i)).map(i => limpios[k][i]);
+      const cv = document.createElement('canvas'); cv.width = W * fr.length; cv.height = H;
+      const g = cv.getContext('2d');
+      fr.forEach((f, i) => g.drawImage(f.c, i*W + mitad - f.ax, H - f.c.height));
+      salida[prefijo + nombre] = {
+        png: cv.toDataURL('image/png'),
+        json: { frames: fr.map((_, i) => ({ filename: `${nombre} ${i}`, frame: { x: i*W, y: 0, w: W, h: H }, duration: Array.isArray(ms) ? ms[i] : ms })),
+                meta: { image: prefijo + nombre + '.png', format: 'RGBA8888', size: { w: W * fr.length, h: H }, scale: '1' } },
+      };
+    }
+  }
+  const pre = document.createElement('pre'); pre.id = 'salida'; pre.textContent = JSON.stringify(salida);
+  document.body.append(pre); document.title = 'Exportado';
+}
+
+let filas = [], fondo = 'claro';
+if (location.search.includes('exportar')) exportar();
+else (async () => {
+  const img = await cargar(HOJAS.espada), esc = img.naturalWidth / 1600;
+  const tabla = document.getElementById('tabla');
+  tabla.innerHTML = '<tr><th></th>' + VARIANTES.map(v => `<th>${v.nombre}<small>${v.nota}</small></th>`).join('') + '</tr>';
+  for (const k of MUESTRA) {
+    const z = ZONAS[k];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="nombre">${NOMBRES[k]}</td>`;
+    for (const v of VARIANTES) {
+      const marcos = recortar(img, z.r.map(x => Math.round(x * esc)), z.n, v.cerrar);
+      marcos.forEach(f => aDaga(f.lienzo));
+      const fr = marcos.map(f => ({ c: limpiar(f, v), ax: f.ax * (v.original ? 1 : v.escala) }));
+      const cv = document.createElement('canvas'); cv.width = 130; cv.height = 130; cv.style.width = '260px';
+      const td = document.createElement('td'); td.append(cv); tr.append(td);
+      filas.push({ cv, fr, ms: z.ms, s: v.original ? 1 : 1 / v.escala });
+      if (!v.original) {
+        const W = fr.reduce((s, x) => s + x.c.width + 6, 0), H = Math.max(...fr.map(x => x.c.height));
+        const t = document.createElement('canvas'); t.width = W; t.height = H; t.className = 'tira';
+        t.style.width = Math.min(1240, W * 4) + 'px';
+        let x = 0; const g = t.getContext('2d'); for (const q of fr) { g.drawImage(q.c, x, H - q.c.height); x += q.c.width + 6; }
+        const h3 = document.createElement('div'); h3.textContent = NOMBRES[k] + ' · ' + v.nombre;
+        document.getElementById('tiras').append(h3, t);
+      }
+    }
+    tabla.append(tr);
+  }
+  document.title = 'Daga · listo';
+  requestAnimationFrame(function bucle(t) {
+    for (const r of filas) {
+      const g = r.cv.getContext('2d'); g.clearRect(0, 0, 130, 130); g.imageSmoothingEnabled = false;
+      const q = r.fr[Math.floor(t / r.ms) % r.fr.length];
+      // Todas las columnas al mismo tamaño en pantalla, para comparar.
+      g.drawImage(q.c, 65 - q.ax * r.s, 126 - q.c.height * r.s, q.c.width * r.s, q.c.height * r.s);
+    }
+    requestAnimationFrame(bucle);
+  });
+})();
+document.querySelectorAll('[data-fondo]').forEach(b => b.onclick = () => {
+  document.body.className = b.dataset.fondo;
+  document.querySelectorAll('[data-fondo]').forEach(x => x.classList.toggle('activo', x === b));
+});
+</script>
+</body>
+</html>

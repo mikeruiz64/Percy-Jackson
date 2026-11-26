@@ -1,0 +1,53 @@
+{
+ "frames": [
+  {
+   "filename": "leer 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 180
+  },
+  {
+   "filename": "leer 1",
+   "frame": {
+    "x": 134,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 180
+  },
+  {
+   "filename": "leer 2",
+   "frame": {
+    "x": 268,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 180
+  },
+  {
+   "filename": "leer 3",
+   "frame": {
+    "x": 402,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 180
+  }
+ ],
+ "meta": {
+  "image": "heroe_tridente_leer.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 536,
+   "h": 79
+  },
+  "scale": "1"
+ }
+}

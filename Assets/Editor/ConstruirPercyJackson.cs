@@ -9,7 +9,8 @@ using UnityEngine;
 
 /// <summary>
 /// Construye los recursos del héroe y la escena principal a partir de las hojas
-/// exportadas desde Aseprite (Assets/Sprites/Heroe/*.png + *.json).
+/// limpias del protagonista (Assets/Sprites/Heroe/heroe_*.png + *.json, formato de Aseprite),
+/// que exporta Arte/Nuevo/scripts/exportar_unity.py. El arma (la daga) va dibujada en el sprite.
 /// Menú: Herramientas > Construir Percy Jackson.
 /// Consola: Unity -batchmode -projectPath . -executeMethod ConstruirPercyJackson.Construir -quit
 /// </summary>
@@ -20,9 +21,13 @@ public static class ConstruirPercyJackson
     const string RutaEscena = "Assets/Escenas/Principal.unity";
     const int PixelesPorUnidad = 32;
 
-    // Animaciones de movimiento: (nombre, se repite en bucle)
-    static readonly (string, bool)[] Movimiento =
-        { ("caminar", true), ("subir", false), ("cima", true), ("caer", true), ("aterrizar", false) };
+    // Animaciones del héroe: (nombre, se repite en bucle). La primera es la de inicio.
+    static readonly (string, bool)[] Animaciones =
+    {
+        ("reposo", true), ("caminar", true), ("correr", true), ("subir", false), ("cima", true), ("caer", true),
+        ("aterrizar", false), ("ataque", false), ("especial", false), ("defender", false), ("danio", false),
+        ("interactuar", false), ("recoger", false), ("leer", false), ("derrota", false),
+    };
 
     static readonly Color ColorFondo = new Color(0.10f, 0.13f, 0.19f);
 
@@ -37,34 +42,20 @@ public static class ConstruirPercyJackson
     public static void Construir()
     {
         EditorSettings.defaultBehaviorMode = EditorBehaviorMode.Mode2D;
-        foreach (var c in new[] { "Assets/Animaciones", "Assets/Animaciones/Heroe",
-                                  "Assets/Animaciones/Tridente", CarpetaPrefabs, "Assets/Escenas" })
+        foreach (var c in new[] { "Assets/Animaciones", "Assets/Animaciones/Heroe", CarpetaPrefabs, "Assets/Escenas" })
             CrearCarpeta(c);
         AssetDatabase.Refresh();
 
-        var reposo = CrearClip("heroe_reposo", "Assets/Animaciones/Heroe/reposo.anim");
-        var brillo = CrearClip("tridente_brillo", "Assets/Animaciones/Tridente/brillo.anim");
-        // Caminar y saltar (como Naia). El héroe y el tridente tienen estados con el mismo nombre,
-        // así Alexios.cs reproduce el mismo estado en los dos y el tridente sigue a la mano.
-        var estadosHeroe = new System.Collections.Generic.List<(string, AnimationClip)> { ("reposo", reposo) };
-        var estadosTridente = new System.Collections.Generic.List<(string, AnimationClip)> { ("reposo", brillo) };
-        foreach (var (nombre, bucle) in Movimiento)
-        {
-            estadosHeroe.Add((nombre, CrearClip("heroe_" + nombre, $"Assets/Animaciones/Heroe/{nombre}.anim", bucle)));
-            estadosTridente.Add((nombre, CrearClip("tridente_" + nombre, $"Assets/Animaciones/Tridente/{nombre}.anim", bucle)));
-        }
-        var ctrlHeroe = CrearControlador("Assets/Animaciones/Heroe/Heroe.controller", estadosHeroe);
-        var ctrlTridente = CrearControlador("Assets/Animaciones/Tridente/Tridente.controller", estadosTridente);
+        // Un estado por animación; Alexios.cs elige cuál se reproduce por su nombre
+        var estados = Animaciones.Select(a => (a.Item1,
+            CrearClip("heroe_" + a.Item1, $"Assets/Animaciones/Heroe/{a.Item1}.anim", a.Item2))).ToList();
+        var ctrlHeroe = CrearControlador("Assets/Animaciones/Heroe/Heroe.controller", estados);
 
-        var suelto = (TextureImporter)AssetImporter.GetAtPath(CarpetaSprites + "/tridente.png");
-        ConfigurarImportador(suelto, SpriteImportMode.Single);
-        suelto.SaveAndReimport();
-
-        var prefab = CrearPrefab(ctrlHeroe, ctrlTridente);
+        var prefab = CrearPrefab(ctrlHeroe);
         CrearEscena(prefab);
         EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(RutaEscena, true) };
         AssetDatabase.SaveAssets();
-        Verificar(reposo, brillo);
+        Verificar();
         Debug.Log("[PercyJackson] Escena construida en " + RutaEscena);
     }
 
@@ -160,23 +151,11 @@ public static class ConstruirPercyJackson
     }
 
     // ---------- Prefab y escena ----------
-    static GameObject CrearPrefab(AnimatorController ctrlHeroe, AnimatorController ctrlTridente)
+    static GameObject CrearPrefab(AnimatorController ctrlHeroe)
     {
         var heroe = new GameObject("Heroe");
         heroe.AddComponent<SpriteRenderer>().sprite = Sprites(CarpetaSprites + "/heroe_reposo.png")[0];
         heroe.AddComponent<Animator>().runtimeAnimatorController = ctrlHeroe;
-
-        // El tridente va encima del personaje, como en el sprite original
-        var tridente = new GameObject("Tridente");
-        tridente.transform.SetParent(heroe.transform, false);
-        var srTridente = tridente.AddComponent<SpriteRenderer>();
-        srTridente.sprite = Sprites(CarpetaSprites + "/tridente_brillo.png")[0];
-        srTridente.sortingOrder = 1;
-        tridente.AddComponent<Animator>().runtimeAnimatorController = ctrlTridente;
-
-        var componente = new SerializedObject(heroe.AddComponent<Heroe>());
-        componente.FindProperty("tridente").objectReferenceValue = tridente;
-        componente.ApplyModifiedPropertiesWithoutUndo();
 
         var prefab = PrefabUtility.SaveAsPrefabAsset(heroe, CarpetaPrefabs + "/Heroe.prefab");
         Object.DestroyImmediate(heroe);
@@ -204,26 +183,29 @@ public static class ConstruirPercyJackson
     }
 
     // ---------- Comprobación ----------
-    static void Verificar(AnimationClip reposo, AnimationClip brillo)
+    static void Verificar()
     {
         void Chk(bool ok, string que) => Debug.Log((ok ? "[OK] " : "[FALLO] ") + que);
-        Chk(Sprites(CarpetaSprites + "/heroe_reposo.png").Length == 4, "heroe_reposo: 4 sprites");
-        Chk(Sprites(CarpetaSprites + "/tridente_brillo.png").Length == 6, "tridente_brillo: 6 sprites");
-        Chk(reposo.isLooping && Mathf.Abs(reposo.length - 1.28f) < 0.01f, $"reposo en bucle, {reposo.length:0.00} s");
-        Chk(brillo.isLooping && Mathf.Abs(brillo.length - 2.03f) < 0.01f, $"brillo en bucle, {brillo.length:0.00} s");
-        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(CarpetaPrefabs + "/Heroe.prefab");
-        Chk(prefab != null && prefab.transform.Find("Tridente") != null, "prefab Heroe con el tridente como hijo");
-        Chk(File.Exists(RutaEscena), "escena principal guardada");
-        Chk(Sprites(CarpetaSprites + "/heroe_caminar.png").Length == 8 && Sprites(CarpetaSprites + "/tridente_caminar.png").Length == 8, "caminar: 8 sprites en héroe y tridente");
+        var esperados = new System.Collections.Generic.Dictionary<string, int>
+        {
+            ["reposo"] = 1, ["caminar"] = 8, ["correr"] = 8, ["subir"] = 2, ["cima"] = 1, ["caer"] = 1, ["aterrizar"] = 2,
+            ["ataque"] = 6, ["especial"] = 6, ["defender"] = 4, ["danio"] = 4, ["interactuar"] = 4, ["recoger"] = 4,
+            ["leer"] = 4, ["derrota"] = 4,
+        };
+        foreach (var e in esperados)
+            Chk(Sprites($"{CarpetaSprites}/heroe_{e.Key}.png").Length == e.Value, $"heroe_{e.Key}: {e.Value} sprites");
         var caminar = AssetDatabase.LoadAssetAtPath<AnimationClip>("Assets/Animaciones/Heroe/caminar.anim");
         Chk(caminar.isLooping && Mathf.Abs(caminar.length - 0.64f) < 0.015f, $"caminar en bucle, {caminar.length:0.00} s");
+        var ataque = AssetDatabase.LoadAssetAtPath<AnimationClip>("Assets/Animaciones/Heroe/ataque.anim");
+        Chk(!ataque.isLooping && Mathf.Abs(ataque.length - 0.42f) < 0.015f, $"ataque sin bucle, {ataque.length:0.00} s");
         var aterrizar = AssetDatabase.LoadAssetAtPath<AnimationClip>("Assets/Animaciones/Heroe/aterrizar.anim");
         Chk(!aterrizar.isLooping && Mathf.Abs(aterrizar.length - 0.17f) < 0.015f, $"aterrizar sin bucle, {aterrizar.length:0.00} s");
-        foreach (var c in new[] { "Heroe/Heroe", "Tridente/Tridente" })
-        {
-            var ctrl = AssetDatabase.LoadAssetAtPath<AnimatorController>($"Assets/Animaciones/{c}.controller");
-            Chk(ctrl.layers[0].stateMachine.states.Length == 6 && ctrl.layers[0].stateMachine.defaultState.name == "reposo", $"{c}.controller: 6 estados, empieza en reposo");
-        }
+        var ctrl = AssetDatabase.LoadAssetAtPath<AnimatorController>("Assets/Animaciones/Heroe/Heroe.controller");
+        Chk(ctrl.layers[0].stateMachine.states.Length == Animaciones.Length && ctrl.layers[0].stateMachine.defaultState.name == "reposo",
+            $"Heroe.controller: {Animaciones.Length} estados, empieza en reposo");
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(CarpetaPrefabs + "/Heroe.prefab");
+        Chk(prefab != null && prefab.transform.childCount == 0, "prefab Heroe sin tridente aparte");
+        Chk(File.Exists(RutaEscena), "escena principal guardada");
     }
 }
 #endif

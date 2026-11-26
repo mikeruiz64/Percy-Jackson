@@ -1,0 +1,53 @@
+{
+ "frames": [
+  {
+   "filename": "recoger 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 130
+  },
+  {
+   "filename": "recoger 1",
+   "frame": {
+    "x": 134,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 130
+  },
+  {
+   "filename": "recoger 2",
+   "frame": {
+    "x": 268,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 130
+  },
+  {
+   "filename": "recoger 3",
+   "frame": {
+    "x": 402,
+    "y": 0,
+    "w": 134,
+    "h": 79
+   },
+   "duration": 130
+  }
+ ],
+ "meta": {
+  "image": "heroe_tridente_recoger.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 536,
+   "h": 79
+  },
+  "scale": "1"
+ }
+}
